@@ -6,11 +6,18 @@ trait ToTerm[A] {
 }
 
 object ToTerm {
-  def reify[A](implicit ct: ClassTag[A]): ToTerm[A] = () => Term.Type(ct.runtimeClass.getSimpleName())
+  def reify[A](implicit ct: ClassTag[A]): ToTerm[A] =
+    () => Term.Type(ct.runtimeClass.getSimpleName())
   implicit def apply[A](implicit to: ToTerm[A]): ToTerm[A] = to
-  
+
   def term[A: ToTerm]: Term = ToTerm[A].toTerm
-  
+
+  implicit val one: ToTerm[Unit] =
+    () => Term.True
+
+  implicit val zero: ToTerm[Nothing] =
+    () => Term.False
+
   implicit def product2[A, B](
       implicit toA: ToTerm[A],
       toB: ToTerm[B]
@@ -22,6 +29,24 @@ object ToTerm {
       toBC: ToTerm[(B, C)]
   ): ToTerm[(A, B, C)] =
     () => Term.And(toA.toTerm(), toBC.toTerm())
+
+  implicit def sum00[A <: Nothing, B <: Nothing](
+      implicit toA: ToTerm[A],
+      toB: ToTerm[B]
+  ): ToTerm[Either[A, B]] =
+    sum[A, B](toA, toB)
+
+  implicit def sum0L[A <: Nothing, B](
+      implicit toA: ToTerm[A],
+      toB: ToTerm[B]
+  ): ToTerm[Either[A, B]] =
+    sum[A, B](toA, toB)
+
+  implicit def sum0R[A, B <: Nothing](
+      implicit toA: ToTerm[A],
+      toB: ToTerm[B]
+  ): ToTerm[Either[A, B]] =
+    sum[A, B](toA, toB)
 
   implicit def sum[A, B](
       implicit toA: ToTerm[A],

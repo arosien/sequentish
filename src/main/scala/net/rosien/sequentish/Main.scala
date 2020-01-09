@@ -5,6 +5,8 @@ import cats.implicits._
 
 object Main extends App {
   println(ToTerm[Int].toTerm().show)
+  println(ToTerm[Nothing].toTerm().show)
+  println(ToTerm[Unit].toTerm().show)
   println(ToTerm[(Int, String)].toTerm().show)
   println(ToTerm[(Int, String, Long)].toTerm().show)
   println(ToTerm[Either[Int, String]].toTerm().show)
@@ -34,9 +36,15 @@ object Main extends App {
   println()
   prove[LJT](Sequent[(A, B, C) => (B, A)])
   println()
-  prove[LJT](Sequent[(A, B), (B, A)])
+  prove[LJT](Sequent[(A, B), (B, A)]) // A * B = B * A
+  prove[LJT](Sequent[Either[A, B], Either[B, A]]) // A + B = B + A
+  prove[LJT](Sequent[(A, Either[B, C]), Either[(A, B), (A, C)]]) // A*(B+C) = (A*B)+(A*C)
   println()
-  prove[LJT](Sequent[(A, Either[B, C]), Either[(A, B), (A, C)]])
+  prove[LJT](Sequent[(Unit, A), A]) // 0 * A = 0
+  prove[LJT](Sequent[(A, Unit), A]) // A * 0 = 0
+  prove[LJT](Sequent[Either[Nothing, Nothing], Nothing]) // 0 + 0 = 0
+  prove[LJT](Sequent[Either[A, Nothing], A]) // A + 0 = A
+  prove[LJT](Sequent[Either[Nothing, A], A]) // 0 + A = A
 
   def prove[Rule: Prover: Show](sequent: Sequent): Unit =
     println(Prover[Rule].prove(sequent).prune.toTree.show)

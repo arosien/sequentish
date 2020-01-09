@@ -13,6 +13,7 @@ sealed trait LJT
 // TODO: Use enumeratum
 object LJT {
   case object Id extends LJT
+  case object `L⊥` extends LJT
   case object `L∧` extends LJT
   case object `L∨` extends LJT
   case object `L⇒1` extends LJT
@@ -42,6 +43,7 @@ object LJT {
     def rules =
       NonEmptySet.of(
         Id,
+        `L⊥`,
         `L∧`,
         `L∨`,
         `L⇒1`,
@@ -61,6 +63,11 @@ object LJT {
         case Id =>
           Prover.Step(rule, sequent) {
             case Sequent(ps, c) if ps contains c =>
+              Prover.Step.Discharged(rule)
+          }
+        case `L⊥` =>
+          Prover.Step(rule, sequent) {
+            case Sequent(ps, _) if ps contains Term.False =>
               Prover.Step.Discharged(rule)
           }
         case `L∧` =>
