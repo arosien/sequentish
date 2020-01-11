@@ -18,6 +18,18 @@ object ToTerm {
   implicit val zero: ToTerm[Nothing] =
     () => Term.False
 
+  implicit def product2_0F[A <: Nothing, B](
+      implicit toA: ToTerm[A],
+      toB: ToTerm[B]
+  ): ToTerm[(A, B)] =
+    () => Term.And(toA.toTerm(), toB.toTerm())
+
+  implicit def product2_0S[A, B <: Nothing](
+      implicit toA: ToTerm[A],
+      toB: ToTerm[B]
+  ): ToTerm[(A, B)] =
+    () => Term.And(toA.toTerm(), toB.toTerm())
+
   implicit def product2[A, B](
       implicit toA: ToTerm[A],
       toB: ToTerm[B]

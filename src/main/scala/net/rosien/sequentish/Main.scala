@@ -42,6 +42,8 @@ object Main extends App {
   println()
   prove[LJT](Sequent[(Unit, A), A]) // 1 * A = A
   prove[LJT](Sequent[(A, Unit), A]) // A * 1 = A
+  prove[LJT](Sequent[(Nothing, A), Nothing]) // 0 * A = 0
+  prove[LJT](Sequent[(A, Nothing), Nothing]) // A * 0 = 0
   prove[LJT](Sequent[Either[Nothing, Nothing], Nothing]) // 0 + 0 = 0
   prove[LJT](Sequent[Either[A, Nothing], A]) // A + 0 = A
   prove[LJT](Sequent[Either[Nothing, A], A]) // 0 + A = A
