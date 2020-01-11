@@ -40,8 +40,8 @@ object Main extends App {
   prove[LJT](Sequent[Either[A, B], Either[B, A]]) // A + B = B + A
   prove[LJT](Sequent[(A, Either[B, C]), Either[(A, B), (A, C)]]) // A*(B+C) = (A*B)+(A*C)
   println()
-  prove[LJT](Sequent[(Unit, A), A]) // 0 * A = 0
-  prove[LJT](Sequent[(A, Unit), A]) // A * 0 = 0
+  prove[LJT](Sequent[(Unit, A), A]) // 1 * A = A
+  prove[LJT](Sequent[(A, Unit), A]) // A * 1 = A
   prove[LJT](Sequent[Either[Nothing, Nothing], Nothing]) // 0 + 0 = 0
   prove[LJT](Sequent[Either[A, Nothing], A]) // A + 0 = A
   prove[LJT](Sequent[Either[Nothing, A], A]) // 0 + A = A
