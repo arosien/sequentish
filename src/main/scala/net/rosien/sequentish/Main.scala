@@ -44,9 +44,13 @@ object Main extends App {
   prove[LJT](Sequent[(A, Unit), A]) // A * 1 = A
   prove[LJT](Sequent[(Nothing, A), Nothing]) // 0 * A = 0
   prove[LJT](Sequent[(A, Nothing), Nothing]) // A * 0 = 0
+  println()
   prove[LJT](Sequent[Either[Nothing, Nothing], Nothing]) // 0 + 0 = 0
   prove[LJT](Sequent[Either[A, Nothing], A]) // A + 0 = A
   prove[LJT](Sequent[Either[Nothing, A], A]) // 0 + A = A
+  println()
+  prove[LJT](Sequent[A => B => C, (A, B) => C]) // A => B => C = (A * B) => C
+  prove[LJT](Sequent[Either[A, B] => C, (A => C, B => C)]) // (A + B) => C = (A => C) * (B => C)
 
   def prove[Rule: Prover: Show](sequent: Sequent): Unit =
     println(Prover[Rule].prove(sequent).prune.toTree.show)
