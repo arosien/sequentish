@@ -139,6 +139,7 @@ object Prover {
         case Step.Stuck(rule)      => RuleProof.Stuck(rule)
         case Step.Discharged(rule) => RuleProof.Discharged(rule)
         case Step.And(rule, sequents) =>
+          // TODO: short-circuit after any (recursive) failure
           RuleProof.And(rule, sequents.map(P.prove))
       }
   }
