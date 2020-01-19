@@ -112,12 +112,10 @@ object LJT {
         case `L⇒4` =>
           Prover.Step(rule, sequent) {
             case Sequent(Term.Implies(Term.Implies(a, b), c) :: g, d) =>
-              Prover.Step.And(
+              Prover.Step.and(
                 rule,
-                NonEmptyList.of(
-                  Sequent(Term.Implies(b, c) :: g, Term.Implies(a, b)),
-                  Sequent(List(c), d)
-                )
+                Sequent(Term.Implies(b, c) :: g, Term.Implies(a, b)),
+                Sequent(List(c), d)
               )
           }
         case `R⇒` =>

@@ -149,6 +149,8 @@ object Prover {
     case class Discharged[A](rule: A) extends Step[A]
     case class And[A](rule: A, sequents: NonEmptyList[Sequent]) extends Step[A]
 
+    def and[A](rule: A, sequent: Sequent, sequents: Sequent*): Step[A] = And(rule, NonEmptyList.of(sequent, (sequents: _*)))
+
     def apply[A](rule: A, sequent: Sequent)(
         pf: PartialFunction[Sequent, Step[A]]
     ): Step[A] =
