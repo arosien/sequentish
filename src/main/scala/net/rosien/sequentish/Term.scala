@@ -16,7 +16,7 @@ object Term {
 
   implicit val show: Show[Term] = {
     case True              => "⊤"
-    case False              => "⊥"
+    case False             => "⊥"
     case Type(name)        => name
     case And(fst, snd)     => show"($fst ∧ $snd)"
     case Or(inl, inr)      => show"($inl ∨ $inr)"
