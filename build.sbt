@@ -8,6 +8,7 @@ scalaVersion := "2.12.10"
 
 libraryDependencies ++= Seq(
   "io.github.stanch" %% "reftree" % "1.3.0",
+  "io.higherkindness" %% "droste-core" % "0.8.0",
   "org.typelevel" %% "cats-core" % "2.0.0"
 )
 
