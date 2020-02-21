@@ -1,7 +1,6 @@
 package net.rosien.sequentish
 
 import cats._
-import cats.data.State
 import cats.implicits._
 import higherkindness.droste._
 import higherkindness.droste.data._
@@ -97,21 +96,6 @@ object RoseF {
         }
     }
 
-  def inc[V] = CoalgebraM[State[Int, ?], RoseF[V, ?], Fixed[V]] {
-    case Fix(RoseF(root, children)) =>
-      for {
-        _ <- State.modify[Int](_ + 1)
-      } yield RoseF(root, children)
-  }
-  def dec[V] = AlgebraM[State[Int, ?], RoseF[V, ?], Fixed[(V, Int)]] {
-    case RoseF(root, children) =>
-      for {
-        d <- State.get[Int]
-        _ <- State.modify[Int](_ - 1)
-      } yield RoseF(root -> d, children).fix
-  }
-  def h[V] = scheme.hyloM(dec[V], inc[V])
-
   def print[V: Show](f: Fixed[V]): String =
     scheme
       .cata(Algebra[RoseF[V, ?], String] {
@@ -120,19 +104,6 @@ object RoseF {
           else show"($root, (${children.mkString(", ")}))"
       })
       .apply(f)
-
-  def prettyAlg[V: Show](indent: Int = 2) =
-    Algebra[RoseF[(V, Int), ?], String] {
-      case RoseF((root, depth), children) =>
-        val prefix = (" " * indent) * depth
-        if (children.isEmpty) show"$prefix$root"
-        else show"$prefix($root${children.mkString("\n", "\n", "")})"
-    }
-
-  def pretty[V: Show](f: Fixed[V], indent: Int = 2): String =
-    scheme
-      .cata(prettyAlg[V](indent))
-      .apply(h(f).runA(-1).value)
 
   /*
   > inherit :: forall f a. Functor f =>
@@ -167,7 +138,7 @@ object RoseF {
   def withDepth[F[_]: Functor](fixed: Fix[F]): Attr[F, Int] =
     inherit(Function.const((_: Int) + 1), 0, fixed)
 
-  def prettyAlg2[V: Show](indent: Int = 2) =
+  def prettyAlg[V: Show](indent: Int = 2) =
     Algebra[AttrF[RoseF[V, ?], Int, ?], String] {
       case AttrF(depth, RoseF(root, children)) =>
         val prefix = (" " * indent) * depth
@@ -176,12 +147,12 @@ object RoseF {
           show"$prefix($root${children.mkString_("\n", "\n", "")})"
     }
 
-  def pretty2[V: Show](f: Fixed[V], indent: Int = 2): String =
+  def pretty[V: Show](f: Fixed[V], indent: Int = 2): String =
     scheme
-      .hylo(prettyAlg2[V](indent), Attr.coalgebra[RoseF[V, ?], Int])
+      .hylo(prettyAlg[V](indent), Attr.coalgebra[RoseF[V, ?], Int])
       .apply(withDepth(f))
 
-  def pretty3[F[_]: Functor](f: Fix[F], indent: Int = 2): String =
+  def pretty2[F[_]: Functor](f: Fix[F], indent: Int = 2): String =
     scheme
       .hylo(
         Algebra[AttrF[F, Int, ?], String] {
@@ -210,16 +181,11 @@ object TermFExample extends App {
       )
       .fix[TermF]
   val tree0 = TermF.toTree(t0)
-  val tree1 = RoseF.h(tree0).runA(0).value
   println(RoseF.print(tree0))
-  println(RoseF.print(tree1))
+
+  println()
+
   println(RoseF.pretty(tree0))
-
   println()
-
-  val tree2 = RoseF.withDepth(tree0)
-  println(tree2)
-  println(RoseF.pretty2(tree0))
-  println()
-  println(RoseF.pretty3[TermF](t0))
+  println(RoseF.pretty2[TermF](t0))
 }
