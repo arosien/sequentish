@@ -3,34 +3,38 @@ package net.rosien.sequentish
 import cats.Show
 import cats.implicits._
 
-object Main extends App {
-  println(ToTerm[Int].toTerm().show)
-  println(ToTerm[Nothing].toTerm().show)
-  println(ToTerm[Unit].toTerm().show)
-  println(ToTerm[(Int, String)].toTerm().show)
-  println(ToTerm[(Int, String, Long)].toTerm().show)
-  println(ToTerm[Either[Int, String]].toTerm().show)
-  println(ToTerm[Int => String].toTerm().show)
-  println(ToTerm[(Int, String) => Long].toTerm().show)
-  println(ToTerm[Int => String => Long].toTerm().show)
-  println(ToTerm[Int => String => Long => Double].toTerm().show)
-  println(ToTerm[(Int, String, Long) => Double].toTerm().show)
+object MainToTerm extends App {
+  showTerm[Int]
+  showTerm[Nothing]
+  showTerm[Unit]
+  showTerm[(Int, String)]
+  showTerm[(Int, String, Long)]
+  showTerm[Either[Int, String]]
+  showTerm[Int => String]
+  showTerm[(Int, String) => Long]
+  showTerm[Int => String => Long]
+  showTerm[Int => String => Long => Double]
+  showTerm[(Int, String, Long) => Double]
+  // TODO: these don't infer
+  // showTerm[(Nothing, Unit)]
+  // showTerm[(Unit, Nothing)]
 
-  trait R
-  trait Q
-  implicit val rt: ToTerm[R] = ToTerm.reify
-  implicit val qt: ToTerm[Q] = ToTerm.reify
-  
-  println("")
-  prove[LJT](Sequent[((R => R) => Q) => Q])
-  
+  def showTerm[A: ToTerm](): Unit =
+    println(ToTerm[A].toTerm().show)
+}
+
+object MainProve extends App {
+
   trait A
   trait B
   trait C
-  implicit val at: ToTerm[A] = ToTerm.reify
-  implicit val bt: ToTerm[B] = ToTerm.reify
-  implicit val ct: ToTerm[C] = ToTerm.reify
-  
+
+  implicit val termA = ToTerm.reify[A]
+  implicit val termB = ToTerm.reify[B]
+  implicit val termC = ToTerm.reify[C]
+
+  prove[LJT](Sequent[((A => A) => B) => B])
+
   println()
   prove[LJT](Sequent[((A => B) => C) => (A => B), (B => C) => (A => B)])
   println()
