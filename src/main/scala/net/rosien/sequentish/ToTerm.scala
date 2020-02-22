@@ -6,9 +6,10 @@ trait ToTerm[A] {
 }
 
 object ToTerm {
+  def apply[A](implicit to: ToTerm[A]): ToTerm[A] = to
+
   def reify[A](implicit ct: ClassTag[A]): ToTerm[A] =
     () => Term.Type(ct.runtimeClass.getSimpleName())
-  implicit def apply[A](implicit to: ToTerm[A]): ToTerm[A] = to
 
   def term[A: ToTerm]: Term = ToTerm[A].toTerm
 
@@ -22,13 +23,13 @@ object ToTerm {
       implicit toA: ToTerm[A],
       toB: ToTerm[B]
   ): ToTerm[(A, B)] =
-    () => Term.And(toA.toTerm(), toB.toTerm())
+    product2[A, B](toA, toB)
 
   implicit def product2_0S[A, B <: Nothing](
       implicit toA: ToTerm[A],
       toB: ToTerm[B]
   ): ToTerm[(A, B)] =
-    () => Term.And(toA.toTerm(), toB.toTerm())
+    product2[A, B](toA, toB)
 
   implicit def product2[A, B](
       implicit toA: ToTerm[A],
