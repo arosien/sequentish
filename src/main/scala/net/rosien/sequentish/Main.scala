@@ -11,7 +11,8 @@ object MainToTerm extends App {
   showTerm[(Int, String, Long)]
   showTerm[Either[Int, String]]
   showTerm[Int => String]
-  showTerm[(Int, String) => Long]
+  showTerm[(Int, String) => Long] // TODO: this is inferred as (Int => String => Long)
+  showTerm[Tuple2[Int, String] => Long]
   showTerm[Int => String => Long]
   showTerm[Int => String => Long => Double]
   showTerm[(Int, String, Long) => Double]
