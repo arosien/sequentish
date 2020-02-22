@@ -16,8 +16,4 @@ object Sequent {
   implicit val show: Show[Sequent] = {
     case Sequent(ps, c) => show"${ps.mkString_(", ")} ⊢ $c"
   }
-  
-  case object Discharged {
-    implicit val show: Show[Discharged.type] = Show.fromToString
-  }
 }
