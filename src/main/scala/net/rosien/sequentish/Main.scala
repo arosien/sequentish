@@ -16,6 +16,7 @@ object MainToTerm extends App {
   showTerm[Int => String => Long]
   showTerm[Int => String => Long => Double]
   showTerm[(Int, String, Long) => Double]
+  showTerm[Tuple3[Int, String, Long] => Double]
   // TODO: these don't infer
   // showTerm[(Nothing, Unit)]
   // showTerm[(Unit, Nothing)]
@@ -54,8 +55,11 @@ object MainProve extends App {
   prove[LJT](Sequent[Either[A, Nothing], A]) // A + 0 = A
   prove[LJT](Sequent[Either[Nothing, A], A]) // 0 + A = A
   println()
-  prove[LJT](Sequent[A => B => C, (A, B) => C]) // A => B => C = (A * B) => C
+  // TODO: currying not provable(?)
+  // prove[LJT](Sequent[A => B => C, Tuple2[A, B] => C]) // A => B => C = (A * B) => C
   prove[LJT](Sequent[Either[A, B] => C, (A => C, B => C)]) // (A + B) => C = (A => C) * (B => C)
+  println()
+  prove[LJT](Sequent[A])
 
   def prove[Rule: Prover: Show](sequent: Sequent): Unit =
     println(Prover[Rule].prove(sequent).prune.toTree.show)
