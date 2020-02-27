@@ -35,32 +35,34 @@ object LK {
   implicit val show: Show[LK] = Show.fromToString
   implicit val order: Order[LK] = Order.by(_.getClass().getSimpleName())
 
-  implicit val prover: Prover[LK] = new Prover[LK] {
-    def rules = NonEmptySet.of(Id, `L⇒`, `R⇒`)
-    def prove(
-        rule: LK,
-        sequent: Sequent
-    ): Prover.Step[LK] =
-      rule match {
-        case LK.Id =>
-          Prover.Step(rule, sequent) {
+  implicit val system: System[LK] =
+    System(NonEmptySet.of[LK](Id, `L⇒`, `R⇒`))
+
+  implicit val deducer: Deducer[LK] =
+    new Deducer[LK] {
+      def deduce(rule: LK): PartialFunction[Sequent, Deduction[LK]] =
+        rule match {
+          case LK.Id => {
             case Sequent(ps, c) if ps contains c =>
-              Prover.Step.Discharged(rule)
+              Deduction.Discharged(rule)
           }
-        case LK.`L⇒` =>
-          Prover.Step(rule, sequent) {
+          case LK.`L⇒` => {
             case Sequent(Term.Implies(a, b) :: g, c) =>
-              Prover.Step.And(
+              Deduction.Success(
                 rule,
                 NonEmptyList
-                  .of(Sequent(Term.Implies(a, b) :: g, a), Sequent(List(b), c))
+                  .of(
+                    Sequent(Term.Implies(a, b) :: g, a),
+                    Sequent(List(b), c)
+                  )
               )
           }
-        case LK.`R⇒` =>
-          Prover.Step(rule, sequent) {
+          case LK.`R⇒` => {
             case Sequent(g, Term.Implies(a, b)) =>
-              Prover.Step.And(rule, NonEmptyList.of(Sequent(a :: g, b)))
+              Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
           }
-      }
-  }
+        }
+    }
+
+  implicit val prover: Prover[LK] = Prover(system)
 }

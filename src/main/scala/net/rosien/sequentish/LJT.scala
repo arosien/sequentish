@@ -39,106 +39,102 @@ object LJT {
       terms.collectFirst { case t: Term.Or => t -> terms.diff(List(t)) }
   }
 
-  implicit val prover: Prover[LJT] = new Prover[LJT] {
-    def rules =
-      NonEmptySet.of(
-        Id,
-        `L⊥`,
-        `L∧`,
-        `L∨`,
-        `L⇒1`,
-        `L⇒2`,
-        `L⇒3`,
-        `L⇒4`,
-        `R⇒`,
-        `R∧`,
-        `R∨1`,
-        `R∨2`
-      )
-    def prove(
-        rule: LJT,
-        sequent: Sequent
-    ): Prover.Step[LJT] =
-      rule match {
-        case Id =>
-          Prover.Step(rule, sequent) {
+  implicit val system = System(
+    NonEmptySet.of[LJT](
+      Id,
+      `L⊥`,
+      `L∧`,
+      `L∨`,
+      `L⇒1`,
+      `L⇒2`,
+      `L⇒3`,
+      `L⇒4`,
+      `R⇒`,
+      `R∧`,
+      `R∨1`,
+      `R∨2`
+    )
+  )
+
+  implicit val deducer: Deducer[LJT] =
+    new Deducer[LJT] {
+      def deduce(rule: LJT): PartialFunction[Sequent, Deduction[LJT]] =
+        rule match {
+          case Id => {
             case Sequent(ps, c) if ps contains c =>
-              Prover.Step.Discharged(rule)
+              Deduction.Discharged(rule)
           }
-        case `L⊥` =>
-          Prover.Step(rule, sequent) {
+          case `L⊥` => {
             case Sequent(ps, _) if ps contains Term.False =>
-              Prover.Step.Discharged(rule)
+              Deduction.Discharged(rule)
           }
-        case `L∧` =>
-          Prover.Step(rule, sequent) {
+          case `L∧` => {
             case Sequent(and(Term.And(a, b), g), h) =>
-              Prover.Step.And(rule, NonEmptyList.of(Sequent(a :: b :: g, h)))
+              Deduction.Success(rule, NonEmptyList.of(Sequent(a :: b :: g, h)))
           }
-        case `L∨` =>
-          Prover.Step(rule, sequent) {
+          case `L∨` => {
             case Sequent(or(Term.Or(a, b), g), h) =>
-              Prover.Step.And(
+              Deduction.Success(
                 rule,
                 NonEmptyList.of(Sequent(a :: g, h), Sequent(b :: g, h))
               )
           }
-        case `L⇒1` =>
-          Prover.Step(rule, sequent) {
+          case `L⇒1` => {
             case Sequent(
                 (a1: Term.Atomic) :: Term.Implies(a2: Term.Atomic, b) :: g,
                 c
                 ) if a1 == a2 =>
-              Prover.Step.And(rule, NonEmptyList.of(Sequent(a1 :: b :: g, c)))
+              Deduction.Success(rule, NonEmptyList.of(Sequent(a1 :: b :: g, c)))
           }
-        case `L⇒2` =>
-          Prover.Step(rule, sequent) {
+          case `L⇒2` => {
             case Sequent(Term.Implies(Term.And(a, b), c) :: g, h) =>
-              Prover.Step.And(
+              Deduction.Success(
                 rule,
                 NonEmptyList
                   .of(Sequent(Term.Implies(a, Term.Implies(b, c)) :: g, h))
               )
           }
-        case `L⇒3` =>
-          Prover.Step(rule, sequent) {
+          case `L⇒3` => {
             case Sequent(Term.Implies(Term.Or(a, b), c) :: g, h) =>
-              Prover.Step.And(
+              Deduction.Success(
                 rule,
                 NonEmptyList
-                  .of(Sequent(Term.Implies(a, c) :: Term.Implies(b, c) :: g, h))
+                  .of(
+                    Sequent(Term.Implies(a, c) :: Term.Implies(b, c) :: g, h)
+                  )
               )
           }
-        case `L⇒4` =>
-          Prover.Step(rule, sequent) {
+          case `L⇒4` => {
             case Sequent(Term.Implies(Term.Implies(a, b), c) :: g, d) =>
-              Prover.Step.and(
+              Deduction.Success(
                 rule,
-                Sequent(Term.Implies(b, c) :: g, Term.Implies(a, b)),
-                Sequent(List(c), d)
+                NonEmptyList.of(
+                  Sequent(Term.Implies(b, c) :: g, Term.Implies(a, b)),
+                  Sequent(List(c), d)
+                )
               )
           }
-        case `R⇒` =>
-          Prover.Step(rule, sequent) {
-            case Sequent(g, Term.Implies(a, b)) =>
-              Prover.Step.And(rule, NonEmptyList.of(Sequent(a :: g, b)))
-          }
-        case `R∧` =>
-          Prover.Step(rule, sequent) {
+          case `R⇒` => // tag::Rimp[] */
+            {
+              case Sequent(g, Term.Implies(a, b)) =>
+                Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
+            }
+          /* end::Rimp[] */
+          case `R∧` => {
             case Sequent(g, Term.And(a, b)) =>
-              Prover.Step
-                .And(rule, NonEmptyList.of(Sequent(g, a), Sequent(g, b)))
+              Deduction
+                .Success(rule, NonEmptyList.of(Sequent(g, a), Sequent(g, b)))
           }
-        case `R∨1` =>
-          Prover.Step(rule, sequent) {
+          case `R∨1` => {
             case Sequent(g, Term.Or(a, _)) =>
-              Prover.Step.And(rule, NonEmptyList.of(Sequent(g, a)))
+              Deduction.Success(rule, NonEmptyList.of(Sequent(g, a)))
           }
-        case `R∨2` =>
-          Prover.Step(rule, sequent) {
+          case `R∨2` => {
             case Sequent(g, Term.Or(_, b)) =>
-              Prover.Step.And(rule, NonEmptyList.of(Sequent(g, b)))
+              Deduction.Success(rule, NonEmptyList.of(Sequent(g, b)))
           }
-      }
-  }
+        }
+    }
+
+  implicit val prover: Prover[LJT] = Prover(system)
 }
