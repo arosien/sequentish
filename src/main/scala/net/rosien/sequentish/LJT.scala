@@ -31,12 +31,12 @@ object LJT {
   // TODO: more generic extractors?
   // TODO: perhaps produce disjunctions of conjunctions for multiple matches?
   object and {
-    def unapply(terms: List[Term]): Option[(Term.And, List[Term])] =
-      terms.collectFirst { case t: Term.And => t -> terms.diff(List(t)) }
+    def unapply(terms: List[Formula]): Option[(Formula.And, List[Formula])] =
+      terms.collectFirst { case t: Formula.And => t -> terms.diff(List(t)) }
   }
   object or {
-    def unapply(terms: List[Term]): Option[(Term.Or, List[Term])] =
-      terms.collectFirst { case t: Term.Or => t -> terms.diff(List(t)) }
+    def unapply(terms: List[Formula]): Option[(Formula.Or, List[Formula])] =
+      terms.collectFirst { case t: Formula.Or => t -> terms.diff(List(t)) }
   }
 
   implicit val system = System(
@@ -65,15 +65,15 @@ object LJT {
               Deduction.Discharged(rule)
           }
           case `L⊥` => {
-            case Sequent(ps, _) if ps contains Term.False =>
+            case Sequent(ps, _) if ps contains Formula.False =>
               Deduction.Discharged(rule)
           }
           case `L∧` => {
-            case Sequent(and(Term.And(a, b), g), h) =>
+            case Sequent(and(Formula.And(a, b), g), h) =>
               Deduction.Success(rule, NonEmptyList.of(Sequent(a :: b :: g, h)))
           }
           case `L∨` => {
-            case Sequent(or(Term.Or(a, b), g), h) =>
+            case Sequent(or(Formula.Or(a, b), g), h) =>
               Deduction.Success(
                 rule,
                 NonEmptyList.of(Sequent(a :: g, h), Sequent(b :: g, h))
@@ -81,56 +81,56 @@ object LJT {
           }
           case `L⇒1` => {
             case Sequent(
-                (a1: Term.Atomic) :: Term.Implies(a2: Term.Atomic, b) :: g,
+                (a1: Formula.Atomic) :: Formula.Implies(a2: Formula.Atomic, b) :: g,
                 c
                 ) if a1 == a2 =>
               Deduction.Success(rule, NonEmptyList.of(Sequent(a1 :: b :: g, c)))
           }
           case `L⇒2` => {
-            case Sequent(Term.Implies(Term.And(a, b), c) :: g, h) =>
+            case Sequent(Formula.Implies(Formula.And(a, b), c) :: g, h) =>
               Deduction.Success(
                 rule,
                 NonEmptyList
-                  .of(Sequent(Term.Implies(a, Term.Implies(b, c)) :: g, h))
+                  .of(Sequent(Formula.Implies(a, Formula.Implies(b, c)) :: g, h))
               )
           }
           case `L⇒3` => {
-            case Sequent(Term.Implies(Term.Or(a, b), c) :: g, h) =>
+            case Sequent(Formula.Implies(Formula.Or(a, b), c) :: g, h) =>
               Deduction.Success(
                 rule,
                 NonEmptyList
                   .of(
-                    Sequent(Term.Implies(a, c) :: Term.Implies(b, c) :: g, h)
+                    Sequent(Formula.Implies(a, c) :: Formula.Implies(b, c) :: g, h)
                   )
               )
           }
           case `L⇒4` => {
-            case Sequent(Term.Implies(Term.Implies(a, b), c) :: g, d) =>
+            case Sequent(Formula.Implies(Formula.Implies(a, b), c) :: g, d) =>
               Deduction.Success(
                 rule,
                 NonEmptyList.of(
-                  Sequent(Term.Implies(b, c) :: g, Term.Implies(a, b)),
+                  Sequent(Formula.Implies(b, c) :: g, Formula.Implies(a, b)),
                   Sequent(List(c), d)
                 )
               )
           }
           case `R⇒` => // tag::Rimp[] */
             {
-              case Sequent(g, Term.Implies(a, b)) =>
+              case Sequent(g, Formula.Implies(a, b)) =>
                 Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
             }
           /* end::Rimp[] */
           case `R∧` => {
-            case Sequent(g, Term.And(a, b)) =>
+            case Sequent(g, Formula.And(a, b)) =>
               Deduction
                 .Success(rule, NonEmptyList.of(Sequent(g, a), Sequent(g, b)))
           }
           case `R∨1` => {
-            case Sequent(g, Term.Or(a, _)) =>
+            case Sequent(g, Formula.Or(a, _)) =>
               Deduction.Success(rule, NonEmptyList.of(Sequent(g, a)))
           }
           case `R∨2` => {
-            case Sequent(g, Term.Or(_, b)) =>
+            case Sequent(g, Formula.Or(_, b)) =>
               Deduction.Success(rule, NonEmptyList.of(Sequent(g, b)))
           }
         }

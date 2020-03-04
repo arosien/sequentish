@@ -47,18 +47,18 @@ object LK {
               Deduction.Discharged(rule)
           }
           case LK.`L⇒` => {
-            case Sequent(Term.Implies(a, b) :: g, c) =>
+            case Sequent(Formula.Implies(a, b) :: g, c) =>
               Deduction.Success(
                 rule,
                 NonEmptyList
                   .of(
-                    Sequent(Term.Implies(a, b) :: g, a),
+                    Sequent(Formula.Implies(a, b) :: g, a),
                     Sequent(List(b), c)
                   )
               )
           }
           case LK.`R⇒` => {
-            case Sequent(g, Term.Implies(a, b)) =>
+            case Sequent(g, Formula.Implies(a, b)) =>
               Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
           }
         }

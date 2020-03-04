@@ -3,18 +3,22 @@ package net.rosien.sequentish
 import cats.Show
 import cats.implicits._
 
-sealed trait Term
+// tag::all[]
+// tag::formula[]
+sealed trait Formula
+// end::formula[]
 
-object Term {
-  sealed trait Atomic extends Term
+object Formula {
+  sealed trait Atomic extends Formula // <1>
   case object True extends Atomic
   case object False extends Atomic
   case class Type(name: String) extends Atomic
-  case class And(fst: Term, snd: Term) extends Term
-  case class Or(inl: Term, inr: Term) extends Term
-  case class Implies(from: Term, to: Term) extends Term
-
-  implicit val show: Show[Term] = {
+  case class And(fst: Formula, snd: Formula) extends Formula
+  case class Or(inl: Formula, inr: Formula) extends Formula
+  case class Implies(from: Formula, to: Formula) extends Formula
+// end::all[]
+// tag::show[]
+  implicit val show: Show[Formula] = {
     case True              => "⊤"
     case False             => "⊥"
     case Type(name)        => name
@@ -22,4 +26,7 @@ object Term {
     case Or(inl, inr)      => show"($inl ∨ $inr)"
     case Implies(from, to) => show"($from ⇒ $to)"
   }
+  // end::show[]  
+  // tag::all[]
 }
+// end::all[]
