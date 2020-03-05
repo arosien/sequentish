@@ -110,3 +110,7 @@ code span.co {
 .slide-content {
   padding-top: 25px;
 }
+
+.wrap {
+  white-space: pre-wrap;
+}
