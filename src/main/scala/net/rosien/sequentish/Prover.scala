@@ -30,12 +30,12 @@ object Deduction {
 }
 
 /** Prove [[Sequent]]s using a set of rules. */
-trait Prover[A] {
-  def prove(sequent: Sequent): Proof[A]
+trait Prover[Rule] {
+  def prove(sequent: Sequent): Proof[Rule]
 }
 
 object Prover {
-  def apply[A](implicit p: Prover[A]): Prover[A] = p
+  def apply[Rule](implicit p: Prover[Rule]): Prover[Rule] = p
 
   def apply[Rule: Deducer](system: System[Rule]): Prover[Rule] =
     new Prover[Rule] {
