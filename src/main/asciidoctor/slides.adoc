@@ -8,6 +8,7 @@
 :sourcedir: ../scala/net/rosien/sequentish
 :source-highlighter: highlightjs
 :stem:
+:tip-caption: 🔊
 
 Adam Rosien https://twitter.com/arosien[`@arosien`]
 
@@ -569,23 +570,66 @@ Does this remind you of something?
 |===
 
 === !
+latexmath:[\dfrac{\dfrac{}{A \vdash A}Id}{\vdash A \Rightarrow A}R\Rightarrow]
 
-:def-sequent: pass:m[stem:[cc"S" := (cc"F"_(premise))^(**) |-- cc"F"_(conclusion)]]
+=== !
 
-[cols="a,2a"]
-|===
-^.^| Formula |
-stem:[cc"F" := top, bot, Type(name), cc"F" vv cc"F", cc"F" ^^ cc"F", cc"F" => cc"F"]
-^.^| Sequent | {def-sequent}
-^.^| Rule |
-stem:[((cc"S"_(premise))^**)/(cc"S"_(conclusion))]
-[grid=none,frame=none]
-!===
-^.^! Deduction: stem:[cc"S"_(conclusion) => (cc"S"_(premise))^**]
-^.^! Reduction: stem:[(cc"S"_(premise))^** => cc"S"_(conclusion)]
-!===
-|===
+[source,scala]
+----
+sealed trait Formula
+----
 
+[.fragment]
+[source,scala]
+----
+case class Sequent(
+  premises: List[Formula],
+  conclusion: Formula)
+----
+
+[.fragment]
+[source,scala]
+----
+case class System[Rule](rules: NonEmptySet[Rule])
+----
+
+[.fragment]
+[source,scala]
+----
+trait Deducer[Rule] {
+  def deduce(rule: Rule):
+    PartialFunction[Sequent, Deduction[Rule]]
+}
+----
+
+[.fragment]
+[source,scala]
+----
+trait Prover[Rule] {
+  def prove(sequent: Sequent): Proof[Rule]
+}
+----
+
+=== !
+
+[graphviz]
+....
+digraph x {
+  rankdir=TB
+  Deduction [shape=record,label="{Deduction | {Stuck | Discharged | Sequent+}}"]
+}
+....
+
+[graphviz]
+....
+digraph x {
+  rankdir=TB
+
+  Proof [shape=record,label="{<p> Proof | {Stuck | Discharged | <q> Proof+ }}"]
+
+  Proof:q -> Proof:p
+}
+....
 
 === Thank you!
 
