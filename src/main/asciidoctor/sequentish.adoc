@@ -1,0 +1,258 @@
+= You Didn't Know It, but You Really Want to Learn Sequent Calculus
+Adam Rosien adam@inner-product.com
+:sourcedir: ../scala/net/rosien/sequentish
+:source-highlighter: prettify
+:stem:
+:toc:
+
+For some reason, I decided I wanted to understand how the Curry-Howard isomorphism could be applied to actual software, and discovered that if I then understood sequent calculus(!), I could generate programs from their type. I’m grateful for another Scala project, <<curryhoward>>, for the initial inspiration, further references, and many ideas I could steal from.
+
+In this talk I’ll share this mathematical and programming journey with you. I built up the system using my go-to functional programming techniques (algebraic data types, typeclasses, reification, and more), so each step of the development can be understood individually and incrementally. I was pleasantly surprised when these strategies really worked! At the same time, the cats library gave me a solid functional foundation to build on, greatly speeding up my development, testing and debugging.
+
+You’ll learn about the core of our field, defined almost 100 years ago, how it pervades our programming tools, and see some code that brought some joy to a programmer doing something weird.
+
+== Our Goal
+
+> given a *type signature*, automatically derive a *program*
+
+There is a famous result in computer science called the <<wiki-ch,Curry-Howard Isomorphism>> that says a proof is a program, and the formula it proves is the type for the program. Interpreted another way: 
+
+[graphviz]
+....
+include::curry-howard.dot[]
+....
+
+Our goal as programmers is to avoid work, so we'll have the computer write the program by translating our type into a formula, then prove it, and then generate the code for the program:
+
+.Our Goal
+[graphviz]
+....
+include::curry-howard-goal.dot[]
+....
+
+== Types and Formulas
+
+First we must be able to analyze type signatures, and to do that we must transform types into data (<<reification>>). We'll call this data `Formula`:
+
+[source,scala]
+include::{sourcedir}/Formula.scala[tag=formula]
+
+We need to model the Scala type system itself, so we need to model a few _primitive_ types:
+
+- `Unit`
+- `Nothing`
+- Arbitrary "proper" types: types without type parameters
+
+And also model composite types:
+
+- Product types: the logical AND of two or more types. For example, a tuple `(A, B)` has both a value of type `A` _AND_ a value of type `B`.
+- Sum types: the logical OR of two or more types. For example, an `Either[A, B]` is either a value of type `A` _OR_ a value of type `B`.
+- Function types: `A => B` takes a value of type `A` as an input and produces a value of type `B`.
+
+Here is the <<ADT,algebraic data type>> for our formulas:
+
+[source,scala]
+----
+include::{sourcedir}/Formula.scala[tag=all]
+----
+<1> We mark our primitive types with the `Atomic` trait.
+
+We transform types to formulas with a <<typeclass>>, `ToFormula[A]`:
+
+[source,scala]
+include::{sourcedir}/ToFormula.scala[tag=ToFormula-def]
+
+.Translations from types to `Formula`
+[cols="a,a,a",width=75%]
+|===
+^| Type ^| Formula ^| Pretty-printed Formula
+
+| `Unit` | `Formula.True` | `⊤`
+| `Nothing` | `Formula.False` | `⊥`
+| `A` | `Formula.Type("A")` | `A`
+| `(A, B)`
+|
+[source,scala]
+----
+Formula.And(
+  Formula.Type("A"),
+  Formula.Type("B"))
+----
+| `(A ∧ B)`
+| `Either[A, B]`
+|
+[source,scala]
+----
+Formula.Or(
+  Formula.Type("A"),
+  Formula.Type("B"))
+----
+| `(A ∨ B)`
+| `A => B`
+|
+[source,scala]
+----
+Formula.Implies(
+  Formula.Type("A"),
+  Formula.Type("B"))
+----
+| `(A ⇒ B)`
+|===
+
+.Transforming a type to a formula
+====
+The type `(A, Either[B, C])` is transformed into a formula via `ToFormula[(A, Either[B, C])].toFormula()`:
+
+[source,scala]
+Formula.And(
+  Formula.Type("A")
+  Formula.Or(
+    Formula.Type("B"),
+    Formula.Type("C")))
+====
+
+TODO: typeclass derivation examples
+
+.Using the `Show` typeclass for pretty-printing
+****
+The https://typelevel.org/cats/api/cats/Show.html[`cats.Show`] typeclass is very useful for creating custom pretty-printing of your algebraic data types. There's even a type-safe version of the Scala `s` string interpolator, called `show`, which only allows string interpolation for types that have a `Show` typeclass instance.
+
+[source,scala]
+include::{sourcedir}/Formula.scala[tag=show]
+****
+
+== Sequents
+
+A _sequent_ is a judgement about logical formulas. And like human judgement, they may be correct or not. Unlike humans however, the logical systems we're exploring have the curious (amazing?) property that....
+
+.A sequent
+====
+stem:[Gamma |-- Delta]
+====
+
+- sequents have zero or more premises (assumptions), and zero or more conclusions
+- premises are on the left; every assumption must be proved == each combined with _conjunction_
+- conclusions are on the right; at least one conclusion must be proved == each combined with _disjunction_
+- ⊢ is pronounced "entails", and means whenever all premises are true, then at least one conclusion will also be true
+- stem:[Gamma] conventionally indicates premises which are not relevant
+- stem:[Delta] (a capital Greek delta) conventionally indicates conclusions which are not relevant.
+- stem:[A_1,...,A_n |-- B_1,...,B_k ] is the same as stem:[|-- (A_1^^...^^A_n) => (B_i vv ... vv B_k)]: whenever every stem:[A_i] is true, at least one stem:[B_i] will also be true.
+
+.Sequents
+====
+stem:[Gamma, A |-- A]:: `A` and anything else (stem:[Gamma]) entails `A`
+stem:[A |-- A, Delta]:: `A` entails `A` or anything else (stem:[Delta])
+stem:[A vv B |-- A, B]:: `A` or `B` entails `A` or `B`
+====
+
+WARNING: We're going to simplify our design by only allowing zero or one conclusions. Thus our sequents will be of the form stem:[A_1,...,A_n |-- B].
+
+[source,scala]
+include::{sourcedir}/Sequent.scala[tag=sequent]
+
+== Proving Sequents
+
+A sequent is a way to pose a question that may be answered by some logical system. That is, we feed a program (the sequent) to a logical system (the interpreter), and it tells us if the sequent can be proved or not.
+
+For example, if we have the sequent stem:[A |-- A], `A` is a premise (the left side of the ⊢), so we can conclude `A`, and `A` is a conclusion (the right side of the ⊢), so the entire sequent is proved. This is one of the basic rules of all logic systems, usually called the _identity_ rule: stem:[Gamma, A |-- A] is (axiomatically) true.
+
+[quote,'https://www.sas.upenn.edu/~htowsner/prooftheory/PropositionalLogic.pdf']
+An inference rule represents a single step in a deduction; it says that from the truth [of] its premises we may immediately infer
+the truth of its conclusion. (More precisely, an inference rule will say that if we have deductions of all its premises, we also have a deduction of its conclusion.)
+
+.Question {counter:question}
+****
+Why is stem:[Gamma] included in the list of premises?::
+While premises are combined with conjunction (AND), we only need to prove one conclusion (`A`). So if `A` appears in the premises, we don't need to pay any attention to any other premise.
+
+[quote,'https://en.wikipedia.org/wiki/Sequent_calculus#Structural_rules']
+Weakening (W) allows the addition of arbitrary elements to a sequence. Intuitively, this is allowed in the antecedent because we can always restrict the scope of our proof (if all cars have wheels, then it's safe to say that all black cars have wheels); and in the succedent because we can always allow for alternative conclusions (if all cars have wheels, then it's safe to say that all cars have either wheels or wings).
+****
+
+.Question {counter:question}
+****
+If we had a sequent with no premises, and only one conclusion, could we prove it? It would look like stem:[|-- A].:: ?
+****
+
+A collection of rules that can prove sequents is called a <<sequent calculus>>.
+
+* Formula: True | False | Type(String) | And(Formula & Formula) | Or(Formula & Formula) | Implies(Formula & Formula)
+* Sequent: (premises: List[Formula]) & (conclusion: Formula)
+* Rule: Sequent -> Sequent
+** Forward Inference: (premise: Sequent) -> (conclusion: Sequent)
+*** infer simpler sequents; re-duction
+** Backwards Deduction: (conclusion: Sequent) -> (premise: Sequent)
+*** get rid of operators until we have atomic clauses; de-duction
+
+IMPORTANT: Rules are bi-directional!
+
+[NOTE]
+====
+reduce:: _re-_ ‘back, again’ + _ducere_ ‘bring, lead’
+deduce:: _de-_ ‘down’ + _ducere_ ‘bring, lead’
+====
+
+.The stem:[R=>] rule
+====
+stem:[(Gamma, A |-- B, Delta)/(Gamma |-- A=>B, Delta)R=>]
+
+We read this top-down (reduction) as: "if we presume A and conclude B, then we can presume A implies B".
+
+We read this bottom-up (deduction) as: "if we presume A implies B, then we can presume A and conclude B".
+
+NOTE: Notice how no formula information is ever lost. We are only moving (sub-)formulas from one side of a sequent to the other.
+====
+
+.Implmenting the stem:[R=>] rule
+====
+[source,scala,indent=0]
+include::{sourcedir}/LJT.scala[tag=Rimp]
+====
+
+=== Sequent Calculus LK
+
+LK:: _**k**lassische Prädikaten**l**ogik_ <<gentzen>>
+
+=== Sequent Calculus LJT
+
+LJ:: intuitionistic version of LK, **j** for _intuitionistischer_
+LJT:: LJ + "terminating", also known as G4ip <<dykchoff>>
+
+=== Encoding Rules
+
+TODO
+
+=== Proof Search
+
+For deduction:
+
+. Encode the type as a formula: `+((A => A) => B) => B+` -> `val t = Formula.Implies(Formula.Implies(Formula.Implies(Formula.Type("A"), Formula.Type("A")), Formula.Type("B")), Formula.Type("B"))`.
+. Create a sequent with no premises, and where the conclusion is the formula: `val s = Sequent(Nil, t)`.
+. For each rule `r` of the system
+.. Produce a deduction from sequent `s`. The deduction can be one of: stuck (the rule doesn't match the sequent), discharged ()
+
+NOTE: Since our sequent has only one conclusion, the `Id` rule will discharge any sequent where the conclusion is (atomically) mentioned in the premises.
+
+[appendix]
+== Programming Strategies
+
+[glossary]
+[[ADT]]algebraic data type:: a structure built from the _AND_ and _OR_ of other structures
+[[reification]]reification:: code-as-data
+[[typeclass]]typeclass:: _crazy wizard magic_
+
+[bibliography]
+== References
+
+- [[[curryhoward]]] https://github.com/Chymyst/curryhoward[Chymyst/curryhoward]
+- [[[dyckhoff]]] https://pdfs.semanticscholar.org/4028/08025049cc2bae569f53f8e197ff4793a7fc.pdf[Contraction-Free Sequent Calculi for Intuitionistic Logic]
+- [[[galmiche]]] http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.35.2618[Formulae-as-Resources Management for an Intuitionistic Theorem Prover]
+- [[[gentzen]]] Gentzen, Gerhard Karl Erich (1934). http://gdz.sub.uni-goettingen.de/dms/resolveppn/?PPN=GDZPPN002375508[Untersuchungen über das logische Schließen. I]. Mathematische Zeitschrift. 39 (2): 176–210. doi:10.1007/BF01201353.
+- [[[logitext]]] http://logitext.mit.edu/main[Logitext]
+- [[[wiki-ch]]] https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence[]
+- [[[wiki-seq]]] https://en.wikipedia.org/wiki/Sequent_calculus[]
+
+to add:
+
+- https://nms.kcl.ac.uk/christian.urban/Prover/[An Implementation of G4ip in Pizza] (Pizza == predecessor to Scala!)
+- https://ix.cs.uoregon.edu/~pdownen/publications/downen_phd.pdf
