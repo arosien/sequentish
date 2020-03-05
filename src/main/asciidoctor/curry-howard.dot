@@ -1,0 +1,42 @@
+digraph x {
+  pad=0.4
+  size="9,15!"
+  node [shape=none]
+  edge [color=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color="#ddddff"
+    fontcolor="#9999ff"
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=blue3]
+    proof [fontcolor=blue3]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  type -> program [label="programmers",color=red3]
+  program -> type [label="type\ninference",color=red3]
+
+  formula -> proof [label="proof system",color=blue3]
+
+  formula -> type [xlabel="Curry-Howard  ",dir=both,color=purple3]
+  program -> proof [label="  Curry-Howard",dir=both,color=purple3]
+ 
+}

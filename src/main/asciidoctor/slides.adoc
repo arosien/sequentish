@@ -1,0 +1,646 @@
+= You Didn't Know It, but You Really Want to Learn Sequent Calculus
+:customcss: ip-big.css
+:highlightjs-languages: scala
+:revealjs_center: false
+:revealjs_hash: true
+:revealjs_theme: black
+:revealjs_width: 1200
+:sourcedir: ../scala/net/rosien/sequentish
+:source-highlighter: highlightjs
+:stem:
+:tip-caption: 🔊
+
+Adam Rosien https://twitter.com/arosien[`@arosien`]
+
+Inner Product LLC https://inner-product.com[`inner-product.com`]
+
+== Our Goal
+
+> given a [.theory]#*type signature*#, +
+> automatically derive a [.accent]#*program*#
+
+=== !
+
+[graphviz]
+....
+digraph x {
+  pad=0.4
+  size="9,15!"
+  node [shape=none]
+  edge [color=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color=white
+    fontcolor=white
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=white]
+    proof [fontcolor=white]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  type -> program [label="programmers",color=white,fontcolor=white]
+  program -> type [label="type\ninference",color=white,fontcolor=white]
+  formula -> type [xlabel="Curry-Howard",dir=both,color=white,fontcolor=white]
+  program -> proof [label="Curry-Howard",dir=both,color=white,fontcolor=white]
+  formula -> proof [label="logical system",color=white,fontcolor=white]
+}
+....
+
+=== !
+
+[graphviz]
+....
+digraph x {
+  pad=0.4
+  size="9,15!"
+  node [shape=none]
+  edge [color=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color=white
+    fontcolor=white
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=white]
+    proof [fontcolor=white]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  type -> program [label="programmers",color=red3]
+  program -> type [label="type\ninference",color=white,fontcolor=white]
+  formula -> type [xlabel="Curry-Howard",dir=both,color=white,fontcolor=white]
+  program -> proof [label="Curry-Howard",dir=both,color=white,fontcolor=white]
+  formula -> proof [label="logical system",color=white,fontcolor=white]
+}
+....
+
+=== !
+
+[graphviz]
+....
+digraph x {
+  pad=0.4
+  size="9,15!"
+  node [shape=none]
+  edge [color=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color=white
+    fontcolor=white
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=white]
+    proof [fontcolor=white]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  type -> program [label="programmers",color=red3]
+  program -> type [label="type\ninference",color=red3]
+  formula -> type [xlabel="Curry-Howard",dir=both,color=white,fontcolor=white]
+  program -> proof [label="Curry-Howard",dir=both,color=white,fontcolor=white]
+  formula -> proof [label="logical system",color=white,fontcolor=white]
+}
+....
+
+=== !
+
+[graphviz]
+....
+digraph x {
+  pad=0.4
+  size="9,15!"
+  node [shape=none]
+  edge [color=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color="#ddddff"
+    fontcolor="#9999ff"
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=blue3]
+    proof [fontcolor=blue3]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  type -> program [label="programmers",color=red3]
+  program -> type [label="type\ninference",color=red3]
+  formula -> type [xlabel="Curry-Howard",dir=both,color=white,fontcolor=white]
+  program -> proof [label="Curry-Howard",dir=both,color=white,fontcolor=white]
+  formula -> proof [label="logical system",color=white,fontcolor=white]
+}
+....
+
+
+=== !
+
+[graphviz]
+....
+digraph x {
+  pad=0.4
+  size="9,15!"
+  node [shape=none]
+  edge [color=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color="#ddddff"
+    fontcolor="#9999ff"
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=blue3]
+    proof [fontcolor=blue3]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  type -> program [label="programmers",color=red3]
+  program -> type [label="type\ninference",color=red3]
+  formula -> type [xlabel="Curry-Howard  ",dir=both,color=purple3]
+  program -> proof [label="  Curry-Howard",dir=both,color=purple3]
+  formula -> proof [label="logical system",color=white,fontcolor=white]
+}
+....
+
+
+=== !
+
+[graphviz]
+....
+include::curry-howard.dot[]
+....
+
+=== !
+
+[graphviz]
+....
+include::curry-howard-goal.dot[]
+....
+
+== Types and Formulas
+
+=== !
+
+[cols=2*^,frame=none,grid=none]
+|===
+| Type | Formula
+
+| `Unit` | ⊤
+| `Nothing` | ⊥
+2*| `A`, etc. 
+| `(A, B)` | `A ∧ B`
+| `Either[A, B]` | `A ∨ B`
+| `A ⇒ B` | `A ⇒ B`
+|===
+
+=== !
+
+[source,scala]
+----
+include::{sourcedir}/Formula.scala[tag=all]
+----
+
+[.strategy]#Reification#
+
+[.strategy]#Algebraic Data Type#
+
+=== Example: Type ⇒ Formula
+
+[source,scala]
+----
+type Example = (A, Either[B, C])
+
+val example =
+  Formula.And(
+    Formula.Type("A")
+    Formula.Or(
+      Formula.Type("B"),
+      Formula.Type("C")))
+----
+
+=== 💯Pretty-Printing with `Show`
+
+[source,scala]
+include::{sourcedir}/Formula.scala[tag=show]
+
+=== 💯Pretty-Printing with `Show`
+
+[source,scala]
+----
+// (A, Either[B, C])
+val example =
+  Formula.And(
+    Formula.Type("A")
+    Formula.Or(
+      Formula.Type("B"),
+      Formula.Type("C")))
+t.show
+// (A ∧ (B ∨ C))
+----
+
+=== Type ⇒ Formula
+
+[source,scala]
+----
+include::{sourcedir}/ToFormula.scala[tag=ToFormula-def]
+----
+
+[source,scala]
+----
+
+ToFormula[(A, Either[B, C])].toFormula.show
+// (A ∧ (B ∨ C))
+----
+
+[.strategy]#Typeclass#
+
+== Sequents
+
+=== !
+
+✅ type => formula +
+❎ formula => proof +
+❎ proof => program
+
+[graphviz]
+....
+include::curry-howard-goal.dot[]
+....
+
+=== !
+
+Please prove this type:
+
+[.theory]#`Unit`#
+
+[.fragment]
+> 🔊 "Give me a `Unit`."
+
+[.fragment]
+[.whee]#`val proof = ()`#
+
+=== !
+
+Please prove this type:
+
+[.theory]#`A`#
+
+[.fragment]
+> 🔊 "Give me an `A`."
+
+[.fragment]
+[.whee]#`val proof = ???`#
+
+=== !
+
+Please prove this type:
+
+[.theory]#`A => A`#
+
+[.fragment]
+> 🔊 "If you give me an `A`, I'll give you an `A`."
+
+[.fragment]
+[.whee]#`val proof = (a: A) => a`#
+
+=== !
+
+Please prove this type:
+
+[.theory]#`(A, B) => A`#
+
+[.fragment]
+> 🔊 "If you give me an `A` and a `B`, +
+ I'll give you an `A`."
+
+[.fragment]
+[.whee]#`val proof = (a: A, _: B) => a`#
+
+=== !
+
+Please prove this type:
+
+[.theory]#`A => Either[A, B]`#
+
+[.fragment]
+> 🔊 "If you give me an `A`, I'll give you an `A` or `B`."
+
+[.fragment]
+[.whee]#`val proof = (a: A) => Right(a)`#
+
+=== !
+
+[.notes]
+--
+We need to be explicit about when we are treating formulas as black boxes, i.e., functions like `A => A`, vs. treating formulas as _premises_ or _conclusions._
+--
+
+How did you know how to do that?
+
+[.fragment]
+Can we teach a computer?
+
+=== !
+
+To prove a conclusion, we need to prove its premises. (proofs are _compositional_)
+
+But formulas don't explicitly model premises and conclusions. We need a new thing: a _sequent_.
+
+:AimpA: pass:m[stem:[A => A]]
+:AentailsA: pass:m[stem:[A |-- A]]
+:GammaDelta: pass:m[stem:[Gamma |-- Delta]]
+:entails: pass:m[stem:[|--]]
+
+=== !
+
+[.theory]#`A => A`#
+
+> 🔊 "If you give me an [.theory]#`A`#, I'll give you an [.theory]#`A`#."
+
+[.fragment]
+====
+↓
+
+> 🔊 "If I [.whee]#presume# I have an [.theory]#`A`#, +
+I can [.whee]#conclude# I have an [.theory]#`A`# (that I can give)."
+====
+
+[.fragment]
+====
+↓
+
+[.theory]#`A ⊢ A`#
+====
+
+=== Sequents
+
+[cols="a,3a",grid=none,frame=none]
+|===
+^.^| [.theory]#`A ⊢ A`# | > 🔊 "If we presume [.theory]#`A`#, we can conclude [.theory]#`A`#."
+|===
+
+[.fragment]
+[cols="a,3a",grid=none,frame=none]
+|===
+^.^| [.theory]#{GammaDelta}# |
+> 🔊 "If the premise [.theory]#Gamma# is true, then the conclusion [.theory]#Delta# is true."
+|===
+
+[.fragment]
+[cols="a,3a",grid=none,frame=none]
+|===
+^.^| [.theory]#{entails}# | > 🔊 "entails"
+|===
+
+== Proving Sequents
+
+=== !
+
+[.theory]#`A => B`#
+
+> 🔊 "If you give me an [.theory]#`A`#, I'll give you an [.theory]#`B`#."
+
+[.fragment]
+====
+↓
+
+[.theory]#`⊢ A => B`#
+
+> 🔊 "If we presume nothing, +
+we can conclude [.theory]#`A => B`#."
+====
+
+=== !
+[cols="a,3a",grid=none,frame=none]
+|===
+^.^| [.theory]#`⊢ A => B`# | > 🔊 "If we presume nothing, we can conclude [.theory]#`A => B`#."
+|===
+
+[.fragment]
+[cols="a,3a",grid=none,frame=none]
+|===
+^.^| [.theory]#`A ⊢ B`# | > 🔊 "If I [.whee]#presume# I have an [.theory]#`A`#, I can [.whee]#conclude# I have an [.theory]#`B`# (that I can give)."
+|===
+
+[.fragment]
+[cols="a,3a",grid=none,frame=none]
+|===
+^.^| [.big_emoji]#`ಠ‿ಠ`# | > 🔊 "That's obviously true. I'm done!"
+|===
+
+=== Reduction ↓
+
+[.theory]
+stem:[(A |-- B)/(|-- A => B)R=>]
+
+> 🔊 "if we presume [.theory]#stem:[A |-- B]#, +
+then we can conclude [.theory]#stem:[|-- A => B]#".
+
+=== Deduction ↑
+
+[.theory]
+stem:[(A |-- B)/(|-- A => B)R=>]
+
+> 🔊 "if we conclude [.theory]#stem:[|-- A => B]#, +
+then we can presume [.theory]#stem:[A |-- B]#".
+
+=== Inference Rules
+
+[.theory]
+stem:[(Gamma, A |-- B)/(Gamma |-- A => B)R=>]
+
+'''
+
+[.theory]#stem:[Gamma]#
+
+> 🔊 "whatever"
+
+
+=== Inference Rules
+
+[.theory]
+stem:[(<premise_1>, <premise_2>, ...)/(<conclusion>)<name>]
+
+[.fragment]
+Does this remind you of something?
+
+[.fragment]
+[grid=none,frame=none]
+|===
+^| Reduction ↓ | premises => conclusion
+^| Deduction ↑ | conclusion => premises
+|===
+
+== Summary
+
+=== type => program in 3 Steps
+
+[cols="a,2a"]
+|===
+^.^| type => [.accent]#formula# |
+[.strategy]#reification# +
+[.strategy]#algebraic data type# +
+[.strategy]#typeclass#
+^.^| formula => [.accent]#proof# |
+^.^| proof => [.accent]#program# |
+[.strategy]#intepreter#
+|===
+
+=== !
+latexmath:[\dfrac{\dfrac{}{A \vdash A}Id}{\vdash A \Rightarrow A}R\Rightarrow]
+
+=== !
+
+[source,scala]
+----
+sealed trait Formula
+----
+
+[.fragment]
+[source,scala]
+----
+case class Sequent(
+  premises: List[Formula],
+  conclusion: Formula)
+----
+
+[.fragment]
+[source,scala]
+----
+case class System[Rule](rules: NonEmptySet[Rule])
+----
+
+[.fragment]
+[source,scala]
+----
+trait Deducer[Rule] {
+  def deduce(rule: Rule):
+    PartialFunction[Sequent, Deduction[Rule]]
+}
+----
+
+[.fragment]
+[source,scala]
+----
+trait Prover[Rule] {
+  def prove(sequent: Sequent): Proof[Rule]
+}
+----
+
+=== !
+
+[graphviz]
+....
+digraph x {
+  rankdir=TB
+  Deduction [shape=record,label="{Deduction | {Stuck | Discharged | Sequent+}}"]
+}
+....
+
+[graphviz]
+....
+digraph x {
+  rankdir=TB
+
+  Proof [shape=record,label="{<p> Proof | {Stuck | Discharged | <q> Proof+ }}"]
+
+  Proof:q -> Proof:p
+}
+....
+
+=== Thank you!
+
+Adam Rosien https://twitter.com/arosien[`@arosien`]
+
+Inner Product LLC https://inner-product.com[`inner-product.com`]
+
+[.accent]#**_Hire us to teach your team!_ ☝︎**#
+
+'''
+
+References and Links:
+
+-

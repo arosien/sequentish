@@ -3,21 +3,19 @@ package net.rosien.sequentish
 import cats._
 import cats.implicits._
 
-case class Sequent(premises: List[Term], conclusion: Term)
+// tag::sequent[]
+case class Sequent(premises: List[Formula], conclusion: Formula)
+// end::sequent[]
 
 object Sequent {
-  def apply(term: Term): Sequent = Sequent(Nil, term)
-  def apply(premise: Term, conclusion: Term): Sequent =
+  def apply(formula: Formula): Sequent = Sequent(Nil, formula)
+  def apply(premise: Formula, conclusion: Formula): Sequent =
     Sequent(List(premise), conclusion)
-  def apply[A: ToTerm]: Sequent = Sequent(ToTerm[A].toTerm)
-  def apply[A: ToTerm, B: ToTerm]: Sequent =
-    Sequent(ToTerm[A].toTerm, ToTerm[B].toTerm)
+  def apply[A: ToFormula]: Sequent = Sequent(ToFormula[A].toFormula)
+  def apply[A: ToFormula, B: ToFormula]: Sequent =
+    Sequent(ToFormula[A].toFormula, ToFormula[B].toFormula)
 
   implicit val show: Show[Sequent] = {
     case Sequent(ps, c) => show"${ps.mkString_(", ")} ⊢ $c"
-  }
-  
-  case object Discharged {
-    implicit val show: Show[Discharged.type] = Show.fromToString
   }
 }
