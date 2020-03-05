@@ -507,7 +507,7 @@ we can conclude [.theory]#`A => B`#."
 [.fragment]
 [cols="a,3a",grid=none,frame=none]
 |===
-^.^| `ಠ‿ಠ` | > 🔊 "That's obviously true. I'm done!"
+^.^| [.big_emoji]#`ಠ‿ಠ`# | > 🔊 "That's obviously true. I'm done!"
 |===
 
 === Reduction ↓
