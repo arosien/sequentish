@@ -31,11 +31,11 @@ object MainProve extends App {
   trait B
   trait C
 
-  implicit val termA = ToFormula.reify[A]
-  implicit val termB = ToFormula.reify[B]
-  implicit val termC = ToFormula.reify[C]
+  implicit val toFormulaA = ToFormula.reify[A]
+  implicit val toFormulaB = ToFormula.reify[B]
+  implicit val toFormulaC = ToFormula.reify[C]
 
-  printProof[LJT]("?", Sequent[((A => A) => B) => B])
+  printProof[LJT]("?", Sequent.conclude[((A => A) => B) => B])
 
   println()
   printProof[LJT]("?", Sequent[((A => B) => C) => (A => B), (B => C) => (A => B)])

@@ -39,29 +39,28 @@ object LK {
     System(NonEmptySet.of[LK](Id, `L⇒`, `R⇒`))
 
   implicit val deducer: Deducer[LK] =
-    new Deducer[LK] {
-      def deduce(rule: LK): PartialFunction[Sequent, Deduction[LK]] =
-        rule match {
-          case LK.Id => {
-            case Sequent(ps, c) if ps contains c =>
-              Deduction.Discharged(rule)
-          }
-          case LK.`L⇒` => {
-            case Sequent(Formula.Implies(a, b) :: g, c) =>
-              Deduction.Success(
-                rule,
-                NonEmptyList
-                  .of(
-                    Sequent(Formula.Implies(a, b) :: g, a),
-                    Sequent(List(b), c)
-                  )
-              )
-          }
-          case LK.`R⇒` => {
-            case Sequent(g, Formula.Implies(a, b)) =>
-              Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
-          }
+    Deducer.fromPFs { rule =>
+      rule match {
+        case LK.Id => {
+          case Sequent(ps, c) if ps contains c =>
+            Deduction.Discharged(rule)
         }
+        case LK.`L⇒` => {
+          case Sequent(Formula.Implies(a, b) :: g, c) =>
+            Deduction.Success(
+              rule,
+              NonEmptyList
+                .of(
+                  Sequent(Formula.Implies(a, b) :: g, a),
+                  Sequent(List(b), c)
+                )
+            )
+        }
+        case LK.`R⇒` => {
+          case Sequent(g, Formula.Implies(a, b)) =>
+            Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
+        }
+      }
     }
 
   implicit val prover: Prover[LK] = Prover(system)

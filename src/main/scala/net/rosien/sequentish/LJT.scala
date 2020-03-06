@@ -57,83 +57,94 @@ object LJT {
   )
 
   implicit val deducer: Deducer[LJT] =
-    new Deducer[LJT] {
-      def deduce(rule: LJT): PartialFunction[Sequent, Deduction[LJT]] =
-        rule match {
-          case Id => {
-            case Sequent(ps, c) if ps contains c =>
-              Deduction.Discharged(rule)
-          }
-          case `L⊥` => {
-            case Sequent(ps, _) if ps contains Formula.False =>
-              Deduction.Discharged(rule)
-          }
-          case `L∧` => {
-            case Sequent(and(Formula.And(a, b), g), h) =>
-              Deduction.Success(rule, NonEmptyList.of(Sequent(a :: b :: g, h)))
-          }
-          case `L∨` => {
-            case Sequent(or(Formula.Or(a, b), g), h) =>
-              Deduction.Success(
-                rule,
-                NonEmptyList.of(Sequent(a :: g, h), Sequent(b :: g, h))
-              )
-          }
-          case `L⇒1` => {
-            case Sequent(
-                (a1: Formula.Atomic) :: Formula.Implies(a2: Formula.Atomic, b) :: g,
-                c
-                ) if a1 == a2 =>
-              Deduction.Success(rule, NonEmptyList.of(Sequent(a1 :: b :: g, c)))
-          }
-          case `L⇒2` => {
-            case Sequent(Formula.Implies(Formula.And(a, b), c) :: g, h) =>
-              Deduction.Success(
-                rule,
-                NonEmptyList
-                  .of(Sequent(Formula.Implies(a, Formula.Implies(b, c)) :: g, h))
-              )
-          }
-          case `L⇒3` => {
-            case Sequent(Formula.Implies(Formula.Or(a, b), c) :: g, h) =>
-              Deduction.Success(
-                rule,
-                NonEmptyList
-                  .of(
-                    Sequent(Formula.Implies(a, c) :: Formula.Implies(b, c) :: g, h)
-                  )
-              )
-          }
-          case `L⇒4` => {
-            case Sequent(Formula.Implies(Formula.Implies(a, b), c) :: g, d) =>
-              Deduction.Success(
-                rule,
-                NonEmptyList.of(
-                  Sequent(Formula.Implies(b, c) :: g, Formula.Implies(a, b)),
-                  Sequent(List(c), d)
-                )
-              )
-          }
-          case `R⇒` => // tag::Rimp[] */
-            {
-              case Sequent(g, Formula.Implies(a, b)) =>
-                Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
-            }
-          /* end::Rimp[] */
-          case `R∧` => {
-            case Sequent(g, Formula.And(a, b)) =>
-              Deduction
-                .Success(rule, NonEmptyList.of(Sequent(g, a), Sequent(g, b)))
-          }
-          case `R∨1` => {
-            case Sequent(g, Formula.Or(a, _)) =>
-              Deduction.Success(rule, NonEmptyList.of(Sequent(g, a)))
-          }
-          case `R∨2` => {
-            case Sequent(g, Formula.Or(_, b)) =>
-              Deduction.Success(rule, NonEmptyList.of(Sequent(g, b)))
-          }
+    Deducer.fromPFs { rule =>
+      rule match {
+        case Id => {
+          case Sequent(ps, c) if ps contains c =>
+            Deduction.Discharged(Id)
         }
+        case `L⊥` => {
+          case Sequent(ps, _) if ps contains Formula.False =>
+            Deduction.Discharged(rule)
+        }
+        case `L∧` => {
+          case Sequent(and(Formula.And(a, b), g), h) =>
+            Deduction.Success(
+              rule,
+              NonEmptyList.of(Sequent(a :: b :: g, h))
+            )
+        }
+        case `L∨` => {
+          case Sequent(or(Formula.Or(a, b), g), h) =>
+            Deduction.Success(
+              rule,
+              NonEmptyList.of(Sequent(a :: g, h), Sequent(b :: g, h))
+            )
+        }
+        case `L⇒1` => {
+          case Sequent(
+              (a1: Formula.Atomic) :: Formula
+                .Implies(a2: Formula.Atomic, b) :: g,
+              c
+              ) if a1 == a2 =>
+            Deduction.Success(
+              rule,
+              NonEmptyList.of(Sequent(a1 :: b :: g, c))
+            )
+        }
+        case `L⇒2` => {
+          case Sequent(Formula.Implies(Formula.And(a, b), c) :: g, h) =>
+            Deduction.Success(
+              rule,
+              NonEmptyList
+                .of(
+                  Sequent(Formula.Implies(a, Formula.Implies(b, c)) :: g, h)
+                )
+            )
+        }
+        case `L⇒3` => {
+          case Sequent(Formula.Implies(Formula.Or(a, b), c) :: g, h) =>
+            Deduction.Success(
+              rule,
+              NonEmptyList
+                .of(
+                  Sequent(
+                    Formula.Implies(a, c) :: Formula.Implies(b, c) :: g,
+                    h
+                  )
+                )
+            )
+        }
+        case `L⇒4` => {
+          case Sequent(Formula.Implies(Formula.Implies(a, b), c) :: g, d) =>
+            Deduction.Success(
+              rule,
+              NonEmptyList.of(
+                Sequent(Formula.Implies(b, c) :: g, Formula.Implies(a, b)),
+                Sequent(List(c), d)
+              )
+            )
+        }
+        case `R⇒` => // tag::Rimp[] */
+          {
+            case Sequent(g, Formula.Implies(a, b)) =>
+              Deduction.Success(rule, NonEmptyList.of(Sequent(a :: g, b)))
+          }
+        /* end::Rimp[] */
+        case `R∧` => {
+          case Sequent(g, Formula.And(a, b)) =>
+            Deduction
+              .Success(rule, NonEmptyList.of(Sequent(g, a), Sequent(g, b)))
+        }
+        case `R∨1` => {
+          case Sequent(g, Formula.Or(a, _)) =>
+            Deduction.Success(rule, NonEmptyList.of(Sequent(g, a)))
+        }
+        case `R∨2` => {
+          case Sequent(g, Formula.Or(_, b)) =>
+            Deduction.Success(rule, NonEmptyList.of(Sequent(g, b)))
+        }
+      }
     }
 
   implicit val prover: Prover[LJT] = Prover(system)

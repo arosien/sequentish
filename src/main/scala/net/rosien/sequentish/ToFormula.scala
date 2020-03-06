@@ -33,11 +33,13 @@ object ToFormula {
   ): ToFormula[(A, B)] =
     product2[A, B](toA, toB)
 
+  // tag::product[]
   implicit def product2[A, B](
       implicit toA: ToFormula[A],
       toB: ToFormula[B]
   ): ToFormula[(A, B)] =
     () => Formula.And(toA.toFormula(), toB.toFormula())
+  // end::product[]
 
   implicit def product3[A, B, C](
       implicit toA: ToFormula[A],
@@ -49,25 +51,27 @@ object ToFormula {
       implicit toA: ToFormula[A],
       toB: ToFormula[B]
   ): ToFormula[Either[A, B]] =
-    sum[A, B](toA, toB)
+    sum2[A, B](toA, toB)
 
   implicit def sum0L[A <: Nothing, B](
       implicit toA: ToFormula[A],
       toB: ToFormula[B]
   ): ToFormula[Either[A, B]] =
-    sum[A, B](toA, toB)
+    sum2[A, B](toA, toB)
 
   implicit def sum0R[A, B <: Nothing](
       implicit toA: ToFormula[A],
       toB: ToFormula[B]
   ): ToFormula[Either[A, B]] =
-    sum[A, B](toA, toB)
+    sum2[A, B](toA, toB)
 
-  implicit def sum[A, B](
+  // tag::sum[]
+  implicit def sum2[A, B](
       implicit toA: ToFormula[A],
       toB: ToFormula[B]
   ): ToFormula[Either[A, B]] =
     () => Formula.Or(toA.toFormula(), toB.toFormula())
+  // end::sum[]
 
   implicit def implies[A, B](
       implicit toA: ToFormula[A],
