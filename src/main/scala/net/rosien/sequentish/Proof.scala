@@ -24,18 +24,18 @@ sealed trait Proof[A] {
         )
     }
 
-  def toTree(): Tree[Proof.Node[A]] = {
-    def toTree(rp: RuleProof[A]): Tree[Proof.Node[A]] =
+  def toTree(): Rose[Proof.Node[A]] = {
+    def toTree(rp: RuleProof[A]): Rose[Proof.Node[A]] =
       rp match {
-        case RuleProof.Discharged(rule) => Tree(Proof.Node.D(rule), Nil)
-        case RuleProof.Stuck(rule)      => Tree(Proof.Node.X(rule), Nil)
+        case RuleProof.Discharged(rule) => Rose(Proof.Node.D(rule), Nil)
+        case RuleProof.Stuck(rule)      => Rose(Proof.Node.X(rule), Nil)
         case RuleProof.And(rule, proofs) =>
-          Tree(Proof.Node.R(rule), proofs.map(_.toTree).toList)
+          Rose(Proof.Node.R(rule), proofs.map(_.toTree).toList)
       }
 
     this match {
       case Proof.Root(sequent, any) =>
-        Tree(Proof.Node.S(sequent), any.map(toTree).toList)
+        Rose(Proof.Node.S(sequent), any.map(toTree).toList)
     }
   }
 }
