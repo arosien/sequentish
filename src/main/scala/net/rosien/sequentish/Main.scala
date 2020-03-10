@@ -67,8 +67,13 @@ object MainProve extends App {
   // TODO: currying not provable(?)
   // prove[LJT](Sequent[A => B => C, Tuple2[A, B] => C]) // A => B => C = (A ∧ B) => C
   printProof[LJT]("∧∨-distributivity", Sequent[(A, Either[B, C]), Either[(A, B), (A, C)]]) // A∧(B∨C) = (A∧B)∨(A∧C)
-
   printProof[LJT]("∧∨-distributivity-exponentials", Sequent[Either[A, B] => C, (A => C, B => C)]) // (A ∨ B) => C = (A => C) ∧ (B => C)
+
+  println()
+  printProof[LJT]("const", Sequent.conclude[A => B => A])
+
+  println()
+  printProof[LJT]("x", Sequent.conclude[Tuple2[A, B] => Either[A, C]])
 
   def printProof[Rule: Prover: Show](name: String, sequent: Sequent): Unit = {
     println(s"${Console.YELLOW}${Console.REVERSED}$name${Console.RESET}")

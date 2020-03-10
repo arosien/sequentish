@@ -23,6 +23,10 @@
 .reveal h3 {
   text-transform: none;
 }
+.reveal p {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
 
 code.sourceCode {
   white-space: pre-wrap;
@@ -52,6 +56,7 @@ code span.co {
   width: 100%;
   margin: 0px;
   font-size: 0.85em;
+  white-space: pre-wrap;
 }
 
 .reveal a.sourceLine {
@@ -69,6 +74,10 @@ code span.co {
 }
 
 .reveal section {
+  padding: 0px 0px;
+}
+
+.reveal .slides > section > section  {
   padding: 0px 0px;
 }
 
@@ -92,6 +101,20 @@ code span.co {
   font-weight: bold;
 }
 
+.strategyNotBig {
+  color: gold;
+  font-weight: bold;
+}
+
+.strategyNotBig::before {
+  content: "☞ ";
+  font-weight: bold;
+}
+
+.notbig {
+  font-size: 100%;
+}
+
 .theory {
   color: gold;
   /* font-weight: bold; */
@@ -111,6 +134,7 @@ code span.co {
   padding-top: 25px;
 }
 
-.wrap {
-  white-space: pre-wrap;
+.console {
+  background-color: gold;
+  color: black;
 }

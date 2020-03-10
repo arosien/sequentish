@@ -4,6 +4,7 @@
 :revealjs_center: false
 :revealjs_hash: true
 :revealjs_theme: black
+:revealjs_height: 800
 :revealjs_width: 1200
 :sourcedir: ../scala/net/rosien/sequentish
 :source-highlighter: highlightjs
@@ -14,10 +15,37 @@ Adam Rosien https://twitter.com/arosien[`@arosien`]
 
 Inner Product LLC https://inner-product.com[`inner-product.com`]
 
-== Our Goal
+== !
 
-> given a [.theory]#*type signature*#, +
+[cols="2a,^.^a",frame=none,grid=none]
+|===
+| image::Chymyst_curryhoward.jpg[] |
+[.fragment]
+[.big_emoji]#ʘ‿ʘ#
+|===
+
+[.fragment]
+[cols="2a,^.^a",frame=none,grid=none]
+|===
+| Sequents? Proofs? +
+WTH is LJT? Why did I start this!? |
+[.fragment]
+[.big_emoji]#( ͡ಠ ʖ̯ ͡ಠ)#
+|===
+
+[.fragment]
+[cols="2a,^.^a",frame=none,grid=none]
+|===
+| Fake it 'til you make it! +
+(but use [.strategyNotBig]#programming strategies#!) | [.big_emoji]#(ᵔᴥᵔ)#
+|===
+
+
+=== Our Goal
+
+> given a [.accent]#*type signature*#, +
 > automatically derive a [.accent]#*program*#
+
 
 === !
 
@@ -260,21 +288,71 @@ include::curry-howard.dot[]
 include::curry-howard-goal.dot[]
 ....
 
-== Types and Formulas
+== Types ⇒ Formulas
+
+[graphviz]
+....
+digraph x {
+  pad=0.4
+  size="9,15!"
+
+  node [shape=none]
+  edge [color=grey fontcolor=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color="#ddddff"
+    fontcolor="#9999ff"
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=blue3]
+    proof [fontcolor=blue3]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  formula -> proof [label=<<b>?</b>>,color=grey,fontcolor=grey,style=bold]
+  program -> type [label="type\ninference",color=grey]
+  type -> program [label="programmers",color=grey]
+
+  formula -> type [xlabel="Curry-Howard  ",dir=both,color=grey]
+  program -> proof [xlabel="  Curry-Howard",dir=both,color=grey]
+
+  type -> formula [label=<<b>  ?</b>>,color=green3,fontcolor=green3,style=bold]
+  proof -> program [xlabel=<<b>? </b>>,color=grey,fontcolor=grey,style=bold]
+}
+....
 
 === !
 
-[cols=2*^,frame=none,grid=none]
+[cols=">,<",frame=none,grid=none]
 |===
 | Type | Formula
 
-| `Unit` | ⊤
-| `Nothing` | ⊥
-2*| `A`, etc. 
-| `(A, B)` | `A ∧ B`
-| `Either[A, B]` | `A ∨ B`
-| `A ⇒ B` | `A ⇒ B`
+| [.theory]#`Unit`# | [.theory]#⊤# 🔊 "_true_"
+| [.theory]#`Nothing`# | [.theory]#⊥# 🔊 "_false_"
+2*| [.theory]#`A`#, ... 
+| [.theory]#`(A, B)`# | [.theory]#`A ∧ B`# 🔊 "_and_"
+| [.theory]#`Either[A, B]`# | [.theory]#`A ∨ B`# 🔊 "_or_"
+| [.theory]#`A ⇒ B`# | [.theory]#`A ⇒ B`# 🔊 "_implies_"
 |===
+
+TODO: type params, universals, existentials.
 
 === !
 
@@ -283,9 +361,7 @@ include::curry-howard-goal.dot[]
 include::{sourcedir}/Formula.scala[tag=all]
 ----
 
-[.strategy]#Reification#
-
-[.strategy]#Algebraic Data Type#
+[.strategy]#Reification# [.strategy]#Algebraic Data Type#
 
 === Example: Type ⇒ Formula
 
@@ -317,8 +393,12 @@ val example =
     Formula.Or(
       Formula.Type("B"),
       Formula.Type("C")))
-t.show
-// (A ∧ (B ∨ C))
+example.show
+----
+
+[.console]
+----
+(A ∧ (B ∨ C))
 ----
 
 === Type ⇒ Formula
@@ -327,28 +407,99 @@ t.show
 ----
 include::{sourcedir}/ToFormula.scala[tag=ToFormula-def]
 ----
+[.strategy]#Typeclass#
+
+=== Type ⇒ Formula
 
 [source,scala]
 ----
+trait A
+trait B
+trait C
+
+implicit val toFormulaA = ToFormula.reify[A]
+implicit val toFormulaB = ToFormula.reify[B]
+implicit val toFormulaC = ToFormula.reify[C]
 
 ToFormula[(A, Either[B, C])].toFormula.show
-// (A ∧ (B ∨ C))
 ----
 
-[.strategy]#Typeclass#
+[.console]
+----
+(A ∧ (B ∨ C))
+----
 
-== Sequents
+=== Type ⇒ Formula
 
-=== !
+[source,scala]
+----
+include::{sourcedir}/ToFormula.scala[tag=product]
 
-✅ type => formula +
-❎ formula => proof +
-❎ proof => program
+include::{sourcedir}/ToFormula.scala[tag=sum]
+----
+
+[.strategy]#Typeclass Derivation#
+
+== Formulas ⇒ Proofs
 
 [graphviz]
 ....
-include::curry-howard-goal.dot[]
+digraph x {
+  pad=0.4
+  size="9,15!"
+
+  node [shape=none]
+  edge [color=grey fontcolor=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color="#ddddff"
+    fontcolor="#9999ff"
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=blue3]
+    proof [fontcolor=blue3]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  formula -> proof [label=<<b>?</b>>,color=green3,fontcolor=green3,style=bold]
+  program -> type [label="type\ninference",color=grey]
+  type -> program [label="programmers",color=grey]
+
+  formula -> type [xlabel="Curry-Howard  ",dir=both,color=grey]
+  program -> proof [xlabel="  Curry-Howard",dir=both,color=grey]
+
+  type -> formula [label=<<b>  typeclass</b>>,color=green3,fontcolor=green3,style=bold]
+  proof -> program [xlabel=<<b>? </b>>,color=grey,fontcolor=grey,style=bold]
+}
 ....
+
+=== !
+
+[source,scala]
+----
+trait Prover[Rule] {
+  def prove(formula: Formula): Proof[Rule]
+}
+
+sealed trait Proof[Rule] // TODO
+----
 
 === !
 
@@ -423,16 +574,92 @@ How did you know how to do that?
 [.fragment]
 Can we teach a computer?
 
+=== More Complex Formulas
+
+Please prove this type:
+
+[.theory]#`(A, B) => Either[A, C]`#
+
+[.fragment]
+[.whee]
+----
+val proof1a: (A, B) => A =
+  (a: A, _) => a
+
+val proof2: A => Either[A, B] =
+  (a: A) => Right(a)
+
+val proof: (A, B) => Either[A, B] =
+  proof1a andThen proof2
+----
+
+[.fragment]
+====
+Notice we didn't use this proof:
+
+[.whee]
+----
+val proof1b: (A, B) => B =
+  (_, b: B) => b
+----
+====
+
 === !
 
-To prove a conclusion, we need to prove its premises. (proofs are _compositional_)
+Formulas are _compositional_: they are composed of other formulas.
 
-But formulas don't explicitly model premises and conclusions. We need a new thing: a _sequent_.
+We have a set of primitive rules that translate formulas into simpler formulas.
 
-:AimpA: pass:m[stem:[A => A]]
-:AentailsA: pass:m[stem:[A |-- A]]
+Proof system: find rules to simplify formulas, until they are so simple they are axiomatically true.
+
+The sequence of rules and formula transformations is the _proof_.
+
+But we need a data structure to store the state: a _sequent_.
+
 :GammaDelta: pass:m[stem:[Gamma |-- Delta]]
 :entails: pass:m[stem:[|--]]
+
+=== !
+
+[cols=">,2,",grid=cols,frame=none]
+|===
+| If we had | Could we produce? | 
+
+| | [.theory]#`(A, B) => Either[A, C]`# | no
+|===
+[.fragment]
+[cols=">,2,",grid=cols,frame=none]
+|===
+| | ↙︎ ↓ extract args |
+| [.theory]#`(A, B)`# | [.theory]#`Either[A, C]`# | no 
+|===
+[.fragment]
+[cols=">,2,",grid=cols,frame=none]
+|===
+| un-pair ↓ |  |
+| [.theory]#`A, B`# | [.theory]#`Either[A, C]`# | no
+|===
+[.fragment]
+[cols=">,2,",grid=cols,frame=none]
+|===
+|  | ↓ choose `A` | 
+| [.theory]#`A, B`# | [.theory]#`A`# | *Yes!* 
+|===
+
+=== !
+
+[cols=">,,",grid=cols,frame=none]
+|===
+| If we had | Could we produce? | 
+
+| | [.theory]#`(A, B) => Either[A, C]`# | [.whee]`(a, _) => Right(a)`
+| | ↙︎ ↓ extract args | ↑
+| [.theory]#`(A, B)`# | [.theory]#`Either[A, C]`# | ↑
+| un-pair ↓ |  | ↑
+| [.theory]#`A, B`# | [.theory]#`Either[A, C]`# | [.whee]`(a, _) => Right(a)`
+|  | ↓ choose `A` | ↑ [.whee]`_ andThen Right(_)`
+| [.theory]#`A, B`# | [.theory]#`A`# | [.whee]`(a, _) => a` 
+|===
 
 === !
 
@@ -475,34 +702,42 @@ I can [.whee]#conclude# I have an [.theory]#`A`# (that I can give)."
 ^.^| [.theory]#{entails}# | > 🔊 "entails"
 |===
 
+[.fragment]
+[source,scala]
+----
+case class Sequent(
+  premises: List[Formula],
+  conclusion: Formula)
+----
+
 == Proving Sequents
 
 === !
 
-[.theory]#`A => B`#
+[.theory]#`A => A`#
 
-> 🔊 "If you give me an [.theory]#`A`#, I'll give you an [.theory]#`B`#."
+> 🔊 "If you give me an [.theory]#`A`#, I'll give you an [.theory]#`A`#."
 
 [.fragment]
 ====
 ↓
 
-[.theory]#`⊢ A => B`#
+[.theory]#`⊢ A => A`#
 
 > 🔊 "If we presume nothing, +
-we can conclude [.theory]#`A => B`#."
+we can conclude [.theory]#`A => A`#."
 ====
 
 === !
 [cols="a,3a",grid=none,frame=none]
 |===
-^.^| [.theory]#`⊢ A => B`# | > 🔊 "If we presume nothing, we can conclude [.theory]#`A => B`#."
+^.^| [.theory]#`⊢ A => A`# | > 🔊 "If we presume nothing, we can conclude [.theory]#`A => A`#."
 |===
 
 [.fragment]
 [cols="a,3a",grid=none,frame=none]
 |===
-^.^| [.theory]#`A ⊢ B`# | > 🔊 "If I [.whee]#presume# I have an [.theory]#`A`#, I can [.whee]#conclude# I have an [.theory]#`B`# (that I can give)."
+^.^| [.theory]#`A ⊢ A`# | > 🔊 "If I [.whee]#presume# I have an [.theory]#`A`#, I can [.whee]#conclude# I have an [.theory]#`A`# (that I can give)."
 |===
 
 [.fragment]
@@ -529,14 +764,24 @@ then we can presume [.theory]#stem:[A |-- B]#".
 
 === Inference Rules
 
-[.theory]
-stem:[(Gamma, A |-- B)/(Gamma |-- A => B)R=>]
+:Rimp: pass:m[stem:[(Gamma, A |-- B)/(Gamma |-- A => B)R=>]]
 
-'''
+[cols="^.^a,>.^a,<2a",grid=none,frame=none]
+|===
+.2+| [.theory]#{Rimp}#
+>| [.theory]#stem:[Gamma]# <| > 🔊 "whatever"
+>| [.theory]#stem:[R=>]# <| > 🔊 "the rule R⇒"
+|===
 
-[.theory]#stem:[Gamma]#
-
-> 🔊 "whatever"
+[source,scala]
+----
+case LK.`R⇒` => {
+  case Sequent(g, Formula.Implies(a, b)) =>
+    Deduction.Success(
+      rule,
+      NonEmptyList.of(Sequent(a :: g, b)))
+}
+----
 
 
 === Inference Rules
@@ -554,6 +799,61 @@ Does this remind you of something?
 ^| Deduction ↑ | conclusion => premises
 |===
 
+=== !
+
+[.theory]
+latexmath:[\dfrac{\dfrac{\dfrac{\dfrac{}{A, B \vdash A}Id}{A, B \vdash A \vee C}R\vee1}{A \wedge B \vdash A \vee C}L\wedge}{\vdash A \wedge B \Rightarrow A \vee C}R\Rightarrow]
+
+== Proofs ⇒ Programs
+
+[graphviz]
+....
+digraph x {
+  pad=0.4
+  size="9,15!"
+
+  node [shape=none]
+  edge [color=grey fontcolor=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color="#ddddff"
+    fontcolor="#9999ff"
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=blue3]
+    proof [fontcolor=blue3]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  formula -> proof [label=<<b>proof system</b>>,color=green3,fontcolor=green3,style=bold]
+  program -> type [label="type\ninference",color=grey]
+  type -> program [label="programmers",color=grey]
+
+  formula -> type [xlabel="Curry-Howard  ",dir=both,color=grey]
+  program -> proof [xlabel="  Curry-Howard",dir=both,color=grey]
+
+  type -> formula [label=<<b>  typeclass</b>>,color=green3,fontcolor=green3,style=bold]
+  proof -> program [xlabel=<<b>? </b>>,color=green3,fontcolor=green3,style=bold]
+}
+....
+
 == Summary
 
 === type => program in 3 Steps
@@ -565,12 +865,13 @@ Does this remind you of something?
 [.strategy]#algebraic data type# +
 [.strategy]#typeclass#
 ^.^| formula => [.accent]#proof# |
+[.strategy]#reification# +
+[.strategy]#algebraic data type# +
+[.strategy]#typeclass# +
+[.strategy]#intepreter#
 ^.^| proof => [.accent]#program# |
 [.strategy]#intepreter#
 |===
-
-=== !
-latexmath:[\dfrac{\dfrac{}{A \vdash A}Id}{\vdash A \Rightarrow A}R\Rightarrow]
 
 === !
 
@@ -597,8 +898,7 @@ case class System[Rule](rules: NonEmptySet[Rule])
 [source,scala]
 ----
 trait Deducer[Rule] {
-  def deduce(rule: Rule):
-    PartialFunction[Sequent, Deduction[Rule]]
+  def deduce(rule: Rule): Sequent => Deduction[Rule]
 }
 ----
 
@@ -609,27 +909,6 @@ trait Prover[Rule] {
   def prove(sequent: Sequent): Proof[Rule]
 }
 ----
-
-=== !
-
-[graphviz]
-....
-digraph x {
-  rankdir=TB
-  Deduction [shape=record,label="{Deduction | {Stuck | Discharged | Sequent+}}"]
-}
-....
-
-[graphviz]
-....
-digraph x {
-  rankdir=TB
-
-  Proof [shape=record,label="{<p> Proof | {Stuck | Discharged | <q> Proof+ }}"]
-
-  Proof:q -> Proof:p
-}
-....
 
 === Thank you!
 
@@ -643,4 +922,4 @@ Inner Product LLC https://inner-product.com[`inner-product.com`]
 
 References and Links:
 
--
+- TODO
