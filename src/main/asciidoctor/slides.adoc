@@ -861,16 +861,16 @@ digraph x {
 [cols="a,2a"]
 |===
 ^.^| type => [.accent]#formula# |
-[.strategy]#reification# +
-[.strategy]#algebraic data type# +
-[.strategy]#typeclass#
+[.strategyNotBig]#reification# +
+[.strategyNotBig]#algebraic data type# +
+[.strategyNotBig]#typeclass#
 ^.^| formula => [.accent]#proof# |
-[.strategy]#reification# +
-[.strategy]#algebraic data type# +
-[.strategy]#typeclass# +
-[.strategy]#intepreter#
+[.strategyNotBig]#reification# +
+[.strategyNotBig]#algebraic data type# +
+[.strategyNotBig]#typeclass# +
+[.strategyNotBig]#intepreter#
 ^.^| proof => [.accent]#program# |
-[.strategy]#intepreter#
+[.strategyNotBig]#intepreter#
 |===
 
 === !
