@@ -23,10 +23,29 @@ Inner Product LLC https://inner-product.com[`inner-product.com`]
 [.fragment]
 [.big_emoji]#ʘ‿ʘ#
 |===
-
 [.fragment]
 [cols="2a,^.^a",frame=none,grid=none]
 |===
+| image::G4ip.png[] |
+[.fragment]
+[.big_emoji]#(｡◕‿◕｡)#
+|===
+
+=== !
+
+image::Heather_Miller_1.png[]
+
+
+=== !
+
+image::Heather_Miller_2.png[height=700]
+
+
+=== !
+
+[cols="a,.^a,^.^a",frame=none,grid=none]
+|===
+| image:G4ip_rules.png[height=400]
 | Sequents? Proofs? +
 WTH is LJT? Why did I start this!? |
 [.fragment]
@@ -34,9 +53,9 @@ WTH is LJT? Why did I start this!? |
 |===
 
 [.fragment]
-[cols="2a,^.^a",frame=none,grid=none]
+[cols="a,a,^.^a",frame=none,grid=none]
 |===
-| Fake it 'til you make it! +
+2+| Fake it 'til you make it! +
 (but use [.strategyNotBig]#programming strategies#!) | [.big_emoji]#(ᵔᴥᵔ)#
 |===
 
@@ -576,50 +595,33 @@ Can we teach a computer?
 
 === More Complex Formulas
 
-Please prove this type:
+// Please prove this type:
 
-[.theory]#`(A, B) => Either[A, C]`#
+// [.theory]#`(A, B) => Either[A, C]`#
 
-[.fragment]
-[.whee]
-----
-val proof1a: (A, B) => A =
-  (a: A, _) => a
+// [.fragment]
+// [.whee]
+// ----
+// val proof1a: (A, B) => A =
+//   (a: A, _) => a
 
-val proof2: A => Either[A, B] =
-  (a: A) => Right(a)
+// val proof2: A => Either[A, B] =
+//   (a: A) => Right(a)
 
-val proof: (A, B) => Either[A, B] =
-  proof1a andThen proof2
-----
+// val proof: (A, B) => Either[A, B] =
+//   proof1a andThen proof2
+// ----
 
-[.fragment]
-====
-Notice we didn't use this proof:
+// [.fragment]
+// ====
+// Notice we didn't use this proof:
 
-[.whee]
-----
-val proof1b: (A, B) => B =
-  (_, b: B) => b
-----
-====
-
-=== !
-
-Formulas are _compositional_: they are composed of other formulas.
-
-We have a set of primitive rules that translate formulas into simpler formulas.
-
-Proof system: find rules to simplify formulas, until they are so simple they are axiomatically true.
-
-The sequence of rules and formula transformations is the _proof_.
-
-But we need a data structure to store the state: a _sequent_.
-
-:GammaDelta: pass:m[stem:[Gamma |-- Delta]]
-:entails: pass:m[stem:[|--]]
-
-=== !
+// [.whee]
+// ----
+// val proof1b: (A, B) => B =
+//   (_, b: B) => b
+// ----
+// ====
 
 [cols=">,2,",grid=cols,frame=none]
 |===
@@ -643,53 +645,41 @@ But we need a data structure to store the state: a _sequent_.
 [cols=">,2,",grid=cols,frame=none]
 |===
 |  | ↓ choose `A` | 
-| [.theory]#`A, B`# | [.theory]#`A`# | *Yes!* 
+| [.theory]#`A, B`# | [.theory]#`A`# | [.accent.]#*Yes!*#
 |===
 
 === !
 
-[cols=">,,",grid=cols,frame=none]
+[cols=">2,",grid=cols,frame=none]
 |===
-| If we had | Could we produce? | 
+| If we had ⊢ Could we produce? | 
 
-| | [.theory]#`(A, B) => Either[A, C]`# | [.whee]`(a, _) => Right(a)`
-| | ↙︎ ↓ extract args | ↑
-| [.theory]#`(A, B)`# | [.theory]#`Either[A, C]`# | ↑
-| un-pair ↓ |  | ↑
-| [.theory]#`A, B`# | [.theory]#`Either[A, C]`# | [.whee]`(a, _) => Right(a)`
-|  | ↓ choose `A` | ↑ [.whee]`_ andThen Right(_)`
-| [.theory]#`A, B`# | [.theory]#`A`# | [.whee]`(a, _) => a` 
+| [.theory]#`⊢ (A, B) => Either[A, C]`# | no
 |===
-
-=== !
-
-[.theory]#`A => A`#
-
-> 🔊 "If you give me an [.theory]#`A`#, I'll give you an [.theory]#`A`#."
-
 [.fragment]
-====
-↓
-
-> 🔊 "If I [.whee]#presume# I have an [.theory]#`A`#, +
-I can [.whee]#conclude# I have an [.theory]#`A`# (that I can give)."
-====
-
+[cols=">2,",grid=cols,frame=none]
+|===
+| ↓ extract args |
+| [.theory]#`(A, B) ⊢ Either[A, C]`# | no 
+|===
 [.fragment]
-====
-↓
-
-[.theory]#`A ⊢ A`#
-====
+[cols=">2,",grid=cols,frame=none]
+|===
+| ↓ un-pair| 
+| [.theory]#`A, B ⊢ Either[A, C]`# | no
+|===
+[.fragment]
+[cols=">2,",grid=cols,frame=none]
+|===
+| ↓ choose `A` | 
+| [.theory]#`A, B ⊢ A`# | [.accent.]#*Yes!*#
+|===
 
 === Sequents
 
-[cols="a,3a",grid=none,frame=none]
-|===
-^.^| [.theory]#`A ⊢ A`# | > 🔊 "If we presume [.theory]#`A`#, we can conclude [.theory]#`A`#."
-|===
+:GammaDelta: pass:m[stem:[Gamma |-- Delta]]
+:entails: pass:m[stem:[|--]]
 
-[.fragment]
 [cols="a,3a",grid=none,frame=none]
 |===
 ^.^| [.theory]#{GammaDelta}# |
@@ -710,67 +700,31 @@ case class Sequent(
   conclusion: Formula)
 ----
 
-== Proving Sequents
-
-=== !
-
-[.theory]#`A => A`#
-
-> 🔊 "If you give me an [.theory]#`A`#, I'll give you an [.theory]#`A`#."
-
-[.fragment]
-====
-↓
-
-[.theory]#`⊢ A => A`#
-
-> 🔊 "If we presume nothing, +
-we can conclude [.theory]#`A => A`#."
-====
-
-=== !
-[cols="a,3a",grid=none,frame=none]
-|===
-^.^| [.theory]#`⊢ A => A`# | > 🔊 "If we presume nothing, we can conclude [.theory]#`A => A`#."
-|===
-
-[.fragment]
-[cols="a,3a",grid=none,frame=none]
-|===
-^.^| [.theory]#`A ⊢ A`# | > 🔊 "If I [.whee]#presume# I have an [.theory]#`A`#, I can [.whee]#conclude# I have an [.theory]#`A`# (that I can give)."
-|===
-
-[.fragment]
-[cols="a,3a",grid=none,frame=none]
-|===
-^.^| [.big_emoji]#`ಠ‿ಠ`# | > 🔊 "That's obviously true. I'm done!"
-|===
-
-=== Reduction ↓
-
-[.theory]
-stem:[(A |-- B)/(|-- A => B)R=>]
-
-> 🔊 "if we presume [.theory]#stem:[A |-- B]#, +
-then we can conclude [.theory]#stem:[|-- A => B]#".
-
 === Deduction ↑
 
 [.theory]
-stem:[(A |-- B)/(|-- A => B)R=>]
+stem:[(A |-- B)/(|-- A => B)]
 
 > 🔊 "if we conclude [.theory]#stem:[|-- A => B]#, +
 then we can presume [.theory]#stem:[A |-- B]#".
 
+[.fragment]
+You can also go the other way: Reduction ↓
+
 === Inference Rules
 
 :Rimp: pass:m[stem:[(Gamma, A |-- B)/(Gamma |-- A => B)R=>]]
+:AimpB: pass:m[stem:[|-- A => B]]
+:AentB: pass:m[stem:[A |-- B]]
 
-[cols="^.^a,>.^a,<2a",grid=none,frame=none]
+[cols="^a,a",grid=none,frame=none]
 |===
-.2+| [.theory]#{Rimp}#
->| [.theory]#stem:[Gamma]# <| > 🔊 "whatever"
->| [.theory]#stem:[R=>]# <| > 🔊 "the rule R⇒"
+2+| [.theory]#{Rimp}#
+<|
+> 🔊 "if we conclude [.theory]#{AimpB}#,
+then we can presume [.theory]#{AentB}#".
+| > [.theory]#stem:[Gamma]# 🔊_"whatever"_ +
+[.theory]#stem:[R=>]# 🔊 _"the rule R⇒"_
 |===
 
 [source,scala]
@@ -854,23 +808,44 @@ digraph x {
 }
 ....
 
+=== Basic Idea: Fold Proofs into Programs
+
+=== !
+
+[cols=">,,",grid=cols,frame=none]
+|===
+| If we had | Could we produce? |
+
+| | [.theory]#`(A, B) => Either[A, C]`# | [.whee]`(a, _) => Right(a)`
+| | ↙︎ ↓ extract args | ↑
+| [.theory]#`(A, B)`# | [.theory]#`Either[A, C]`# | ↑
+| un-pair ↓ |  | ↑
+| [.theory]#`A, B`# | [.theory]#`Either[A, C]`# | [.whee]`(a, _) => Right(a)`
+|  | ↓ choose `A` | ↑ [.whee]`_ andThen Right(_)`
+| [.theory]#`A, B`# | [.theory]#`A`# | [.whee]`(a, _) => a` 
+|===
+
+
 == Summary
 
 === type => program in 3 Steps
 
-[cols="a,2a"]
+[cols="a,a",frame=none,grid=rows]
 |===
 ^.^| type => [.accent]#formula# |
 [.strategyNotBig]#reification# +
 [.strategyNotBig]#algebraic data type# +
-[.strategyNotBig]#typeclass#
+[.strategyNotBig]#typeclass# +
+[.strategyNotBig]#typeclass derivation#
 ^.^| formula => [.accent]#proof# |
 [.strategyNotBig]#reification# +
 [.strategyNotBig]#algebraic data type# +
+[.strategyNotBig]#structural recursion# +
 [.strategyNotBig]#typeclass# +
 [.strategyNotBig]#intepreter#
 ^.^| proof => [.accent]#program# |
-[.strategyNotBig]#intepreter#
+[.strategyNotBig]#intepreter# +
+[.strategyNotBig]#structural recursion#
 |===
 
 === !
@@ -920,8 +895,12 @@ Inner Product LLC https://inner-product.com[`inner-product.com`]
 
 '''
 
-References and Links:
+[cols="a,a",grid=none,frame=none]
+|===
+.^| image::Nintendo.png[]
+| References and Links:
 
 - https://github.com/Chymyst/curryhoward
+- https://nms.kcl.ac.uk/christian.urban/Prover
 - https://en.wikipedia.org/wiki/Sequent_calculus
-- http://logitext.mit.edu/main
+|===
