@@ -922,4 +922,6 @@ Inner Product LLC https://inner-product.com[`inner-product.com`]
 
 References and Links:
 
-- TODO
+- https://github.com/Chymyst/curryhoward
+- https://en.wikipedia.org/wiki/Sequent_calculus
+- http://logitext.mit.edu/main
