@@ -34,7 +34,7 @@ digraph x {
   type -> program [label="programmers",color=red3]
   program -> type [label="type\ninference",color=red3]
 
-  formula -> proof [label="proof system",color=blue3]
+  formula -> proof [label="?",color=blue3]
 
   formula -> type [xlabel="Curry-Howard  ",dir=both,color=purple3]
   program -> proof [label="  Curry-Howard",dir=both,color=purple3]

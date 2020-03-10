@@ -32,13 +32,13 @@ digraph x {
     { rank=same type program }  
   }
 
-  formula -> proof [label=<<b>proof system</b>>,color=green3,fontcolor=green3,style=bold]
+  formula -> proof [label=<<b>?</b>>,color=green3,fontcolor=green3,style=bold]
   program -> type [label="type\ninference",color=grey]
   type -> program [label="programmers",color=grey]
 
   formula -> type [xlabel="Curry-Howard  ",dir=both,color=grey]
   program -> proof [xlabel="  Curry-Howard",dir=both,color=grey]
 
-  type -> formula [label=<<b>  typeclass</b>>,color=green3,fontcolor=green3,style=bold]
-  proof -> program [xlabel=<<b>interpreter </b>>,color=green3,fontcolor=green3,style=bold]
+  type -> formula [label=<<b>  ?</b>>,color=green3,fontcolor=green3,style=bold]
+  proof -> program [xlabel=<<b>? </b>>,color=green3,fontcolor=green3,style=bold]
 }
