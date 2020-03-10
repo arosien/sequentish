@@ -4,10 +4,12 @@ import cats._
 import cats.data._
 import cats.implicits._
 
+// TODO: Use enumeratum
+
 /** https://en.wikipedia.org/wiki/Sequent_calculus#The_system_LK */
+// tag::lk[]
 sealed trait LK
 
-// TODO: Use enumeratum
 object LK {
 
   /**
@@ -15,6 +17,7 @@ object LK {
     * Γ, A ⊢ A
     */
   case object Id extends LK
+  // end::lk[]
 
   /**
     * Γ, A ⇒ B ⊢ A  Γ, B ⊢ C
@@ -41,10 +44,12 @@ object LK {
   implicit val deducer: Deducer[LK] =
     Deducer.fromPFs { rule =>
       rule match {
+        // tag::id[]
         case LK.Id => {
           case Sequent(ps, c) if ps contains c =>
             Deduction.Discharged(rule)
         }
+        // end::id[]
         case LK.`L⇒` => {
           case Sequent(Formula.Implies(a, b) :: g, c) =>
             Deduction.Success(

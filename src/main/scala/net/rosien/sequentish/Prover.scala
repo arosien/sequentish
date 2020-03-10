@@ -3,13 +3,15 @@ package net.rosien.sequentish
 import cats.data._
 import cats.implicits._
 
-// tag::prover[]
 /** Prove [[Formula]] or [[Sequent]]s using a set of rules. */
+// tag::prover[]
 trait Prover[Rule] {
   def prove(sequent: Sequent): Proof[Rule]
+  // end::prover[]
 
   def prove(formula: Formula): Proof[Rule] =
     prove(Sequent.conclude(formula))
+// tag::prover[]
 }
 // end::prover[]
 

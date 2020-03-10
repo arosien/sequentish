@@ -737,26 +737,77 @@ case LK.`R⇒` => {
 }
 ----
 
-
-=== Inference Rules
-
-[.theory]
-stem:[(<premise_1>, <premise_2>, ...)/(<conclusion>)<name>]
+=== !
 
 [.fragment]
-Does this remind you of something?
-
-[.fragment]
-[grid=none,frame=none]
+[cols="2a,3a",frame=none,grid=none]
 |===
-^| Reduction ↓ | premises => conclusion
-^| Deduction ↑ | conclusion => premises
+| A collection of rules is known as a [.accent]#_system_#. |
+[source,scala]
+include::{sourcedir}/System.scala[tag=system]
+|===
+[.fragment]
+[cols="2a,3a",frame=none,grid=none]
+|===
+.^| Gerhard Gentzen created the [.accent]#*LK*# (_**[.accent]#k#**lassische Prädikaten**[.accent]#l#**ogik_) system in 1934. |[source,scala]
+----
+include::{sourcedir}/LK.scala[tag=lk]
+
+  ... 
+----
+|===
+
+=== ! 
+
+[cols="a,2a",frame=none,grid=none]
+|===
+| Each rule specifies a possible [.accent]#_deduction_#. | 
+[source,scala]
+----
+include::{sourcedir}/LK.scala[tag=id,indent=0]
+----
+|===
+
+[.fragment]
+[cols="a,2a",frame=none,grid=none]
+|===
+A deduction can be [.accent]#_stuck_#, [.accent]#_discharged_# (done), or [.accent]#_success_# (produces one or more new sequents).
+|
+[source,scala]
+----
+include::{sourcedir}/Deducer.scala[tag=deduction,indent=0]
+----
 |===
 
 === !
 
-[.theory]
+[cols="a,2a",frame=none,grid=none]
+|===
+A [.accent]#_prover_# attempts to prove a sequent.
+|
+[source,scala]
+----
+include::{sourcedir}/Prover.scala[tag=prover,indent=0]
+----
+|===
+
+=== !
+
+[cols="a",frame=none,grid=none]
+|===
+| [.theory]
 latexmath:[\dfrac{\dfrac{\dfrac{\dfrac{}{A, B \vdash A}Id}{A, B \vdash A \vee C}R\vee1}{A \wedge B \vdash A \vee C}L\wedge}{\vdash A \wedge B \Rightarrow A \vee C}R\Rightarrow]
+|
+[source]
+( ⊢ ((A ∧ B) ⇒ (A ∨ C))
+ (R⇒
+  ((A ∧ B) ⊢ (A ∨ C)
+   (L∧
+    (A, B ⊢ (A ∨ C)
+     (R∨1
+      (A, B ⊢ A
+       (Id))))))))
+|===
 
 == Proofs ⇒ Programs
 
@@ -812,7 +863,7 @@ digraph x {
 
 === !
 
-[cols=">,,",grid=cols,frame=none]
+[cols=">,2,2",grid=cols,frame=none]
 |===
 | If we had | Could we produce? |
 
@@ -828,6 +879,9 @@ digraph x {
 
 == Summary
 
+[.step]
+- 
+
 === type => program in 3 Steps
 
 [cols="a,a",frame=none,grid=rows]
@@ -842,9 +896,9 @@ digraph x {
 [.strategyNotBig]#algebraic data type# +
 [.strategyNotBig]#structural recursion# +
 [.strategyNotBig]#typeclass# +
-[.strategyNotBig]#intepreter#
+[.strategyNotBig]#interpreter#
 ^.^| proof => [.accent]#program# |
-[.strategyNotBig]#intepreter# +
+[.strategyNotBig]#interpreter# +
 [.strategyNotBig]#structural recursion#
 |===
 
@@ -903,4 +957,5 @@ Inner Product LLC https://inner-product.com[`inner-product.com`]
 - https://github.com/Chymyst/curryhoward
 - https://nms.kcl.ac.uk/christian.urban/Prover
 - https://en.wikipedia.org/wiki/Sequent_calculus
+- https://github.com/arosien/sequentish
 |===
