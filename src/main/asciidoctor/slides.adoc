@@ -913,8 +913,62 @@ digraph x {
 
 == Summary
 
-[.step]
-- 
+[cols=".^2a,.^a",frame=none,grid=none]
+|===
+| While not originally popular with t-shirt collectors in 1934, sequent calculus is still cool. |
+image::Nintendo.png[]
+|===
+[cols="2a,a",frame=none,grid=none]
+|===
+| Curry-Howard lets us translate our programming problems into logic problems, and back. It's used _everywhere_. And it's not too difficult to implement yourself. |
+[graphviz]
+....
+digraph x {
+  // pad=0.4
+  // size="9,15!"
+
+  node [shape=none]
+  edge [color=grey fontcolor=grey fontname="times-italic"]
+
+  subgraph cluster_logic {
+    label=<Logic>
+    color="#ddddff"
+    fontcolor="#9999ff"
+    fontname="times-italic"
+    style=dashed
+
+    formula [fontcolor=blue3]
+    proof [fontcolor=blue3]
+    
+    { rank=same formula proof }
+  }
+ 
+  subgraph cluster_prog {
+    label="\nProgramming"
+    labelloc=b
+    color="#ffdddd"
+    fontcolor="#ff9999"
+    fontname="times-italic"
+    style=dashed
+    
+    program [fontcolor=red3]
+    type [fontcolor=red3]
+    
+    { rank=same type program }  
+  }
+
+  formula -> proof [label=<<b>proof system</b>>,color=green3,fontcolor=green3,style=bold]
+  program -> type [label="type\ninference",color=grey]
+  type -> program [label="programmers",color=grey]
+
+  formula -> type [xlabel="Curry-Howard  ",dir=both,color=grey]
+  program -> proof [xlabel="  Curry-Howard",dir=both,color=grey]
+
+  type -> formula [label=<<b>  typeclass</b>>,color=green3,fontcolor=green3,style=bold]
+  proof -> program [xlabel=<<b>interpreter </b>>,color=green3,fontcolor=green3,style=bold]
+}
+....
+|===
 
 === type => program in 3 Steps
 
@@ -936,43 +990,6 @@ digraph x {
 [.strategyNotBig]#structural recursion#
 |===
 
-=== !
-
-[source,scala]
-----
-sealed trait Formula
-----
-
-[.fragment]
-[source,scala]
-----
-case class Sequent(
-  premises: List[Formula],
-  conclusion: Formula)
-----
-
-[.fragment]
-[source,scala]
-----
-case class System[Rule](rules: NonEmptySet[Rule])
-----
-
-[.fragment]
-[source,scala]
-----
-trait Deducer[Rule] {
-  def deduce(rule: Rule): Sequent => Deduction[Rule]
-}
-----
-
-[.fragment]
-[source,scala]
-----
-trait Prover[Rule] {
-  def prove(sequent: Sequent): Proof[Rule]
-}
-----
-
 === Thank you!
 
 Adam Rosien https://twitter.com/arosien[`@arosien`]
@@ -982,14 +999,9 @@ Inner Product LLC https://inner-product.com[`inner-product.com`]
 [.accent]#**_Hire us to teach your team!_ ☝︎**#
 
 '''
-
-[cols="a,a",grid=none,frame=none]
-|===
-.^| image::Nintendo.png[]
-| References and Links:
+References and Links
 
 - https://github.com/Chymyst/curryhoward
 - https://nms.kcl.ac.uk/christian.urban/Prover
 - https://en.wikipedia.org/wiki/Sequent_calculus
 - https://github.com/arosien/sequentish
-|===
