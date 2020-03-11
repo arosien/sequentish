@@ -73,7 +73,7 @@ object MainProve extends App {
   printProof[LJT]("const", Sequent.conclude[A => B => A])
 
   println()
-  printProof[LJT]("x", Sequent.conclude[Tuple2[A, B] => Either[A, C]])
+  printProof[LK]("x", Sequent.conclude[Tuple2[A, B] => Either[A, C]])
 
   def printProof[Rule: Prover: Show](name: String, sequent: Sequent): Unit = {
     println(s"${Console.YELLOW}${Console.REVERSED}$name${Console.RESET}")

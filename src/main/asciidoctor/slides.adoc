@@ -791,14 +791,19 @@ include::{sourcedir}/Prover.scala[tag=prover,indent=0]
 ----
 |===
 
-=== !
+:AandBimpAorC:
 
-[cols="a",frame=none,grid=none]
-|===
-| [.theory]
-latexmath:[\dfrac{\dfrac{\dfrac{\dfrac{}{A, B \vdash A}Id}{A, B \vdash A \vee C}R\vee1}{A \wedge B \vdash A \vee C}L\wedge}{\vdash A \wedge B \Rightarrow A \vee C}R\Rightarrow]
-|
-[source]
+[.fragment]
+====
+[source,scala]
+----
+val sequent =
+  Sequent.conclude[Tuple2[A, B] => Either[A, C]]
+
+Prover[LK].prove(sequent).prune.toTree.show
+----
+[.console]
+----
 ( ⊢ ((A ∧ B) ⇒ (A ∨ C))
  (R⇒
   ((A ∧ B) ⊢ (A ∨ C)
@@ -807,7 +812,30 @@ latexmath:[\dfrac{\dfrac{\dfrac{\dfrac{}{A, B \vdash A}Id}{A, B \vdash A \vee C}
      (R∨1
       (A, B ⊢ A
        (Id))))))))
+----
+====
+
+=== !
+
+[cols="a,a",frame=none,grid=none]
 |===
+| [.theory]
+latexmath:[\dfrac{\dfrac{\dfrac{\dfrac{}{A, B \vdash A}Id}{A, B \vdash A \vee C}R\vee1}{A \wedge B \vdash A \vee C}L\wedge}{\vdash A \wedge B \Rightarrow A \vee C}R\Rightarrow]
+|
+[.theory]
+----
+( ⊢ ((A ∧ B) ⇒ (A ∨ C))
+ (R⇒
+  ((A ∧ B) ⊢ (A ∨ C)
+   (L∧
+    (A, B ⊢ (A ∨ C)
+     (R∨1
+      (A, B ⊢ A
+       (Id))))))))
+----
+|===
+
+> Remember everybody, only in computer science do trees grow upside-down!
 
 == Proofs ⇒ Programs
 

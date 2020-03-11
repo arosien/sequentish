@@ -28,17 +28,6 @@ object LJT {
   implicit val show: Show[LJT] = Show.fromToString
   implicit val order: Order[LJT] = Order.by(_.getClass().getSimpleName())
 
-  // TODO: more generic extractors?
-  // TODO: perhaps produce disjunctions of conjunctions for multiple matches?
-  object and {
-    def unapply(terms: List[Formula]): Option[(Formula.And, List[Formula])] =
-      terms.collectFirst { case t: Formula.And => t -> terms.diff(List(t)) }
-  }
-  object or {
-    def unapply(terms: List[Formula]): Option[(Formula.Or, List[Formula])] =
-      terms.collectFirst { case t: Formula.Or => t -> terms.diff(List(t)) }
-  }
-
   implicit val system = System(
     NonEmptySet.of[LJT](
       Id,
@@ -68,14 +57,14 @@ object LJT {
             Deduction.Discharged(rule)
         }
         case `L∧` => {
-          case Sequent(and(Formula.And(a, b), g), h) =>
+          case Sequent(Formula.firstAnd(Formula.And(a, b), g), h) =>
             Deduction.Success(
               rule,
               NonEmptyList.of(Sequent(a :: b :: g, h))
             )
         }
         case `L∨` => {
-          case Sequent(or(Formula.Or(a, b), g), h) =>
+          case Sequent(Formula.firstOr(Formula.Or(a, b), g), h) =>
             Deduction.Success(
               rule,
               NonEmptyList.of(Sequent(a :: g, h), Sequent(b :: g, h))
