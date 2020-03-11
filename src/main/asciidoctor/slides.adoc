@@ -876,6 +876,12 @@ digraph x {
 | [.theory]#`A, B`# | [.theory]#`A`# | [.whee]`(a, _) => a` 
 |===
 
+=== [.big_emoji]#(∩｀-´)⊃━☆ﾟ.*･｡ﾟ#
+
+----
+// TODO: "Simply Typed Lambda Calculus" ADT and intepreter
+// TODO: macro to build programs at compile-time.
+----
 
 == Summary
 
