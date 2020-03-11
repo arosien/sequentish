@@ -56,7 +56,7 @@ WTH is LJT? Why did I start this!? |
 [cols="a,a,^.^a",frame=none,grid=none]
 |===
 2+| Fake it 'til you make it! +
-(but use [.strategyNotBig]#programming strategies#!) | [.big_emoji]#(ᵔᴥᵔ)#
+(but use [.strategyNotBig]#programming strategies#!) ^| [.big_emoji]#(ᵔᴥᵔ)#
 |===
 
 
