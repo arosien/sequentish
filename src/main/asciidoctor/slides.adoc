@@ -771,7 +771,7 @@ include::{sourcedir}/LK.scala[tag=id,indent=0]
 [.fragment]
 [cols="a,2a",frame=none,grid=none]
 |===
-A deduction can be [.accent]#_stuck_#, [.accent]#_discharged_# (done), or [.accent]#_success_# (produces one or more new sequents).
+A deduction can be [.accent]#_stuck_#, [.accent]#_discharged_# (done), or [.accent]#_success_# (produces one or more new, but simpler, sequents).
 |
 [source,scala]
 ----
