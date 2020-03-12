@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+:root {
+  --ip-red: #e94343;
+  --ip-dark-blue: #0C1926;
+}
+
+.reveal.slide {
+  background-color: var(--ip-dark-blue);
+}
+.reveal h1 {
+  font-family: "Raleway", sans-serif;
+}
+.reveal h2 {
+  font-family: "Raleway", sans-serif;
+}
+.reveal h1.title {
+  color: var(--ip-red);
+}
+.reveal .title h1 {
+  color: var(--ip-red);
+}
+.reveal h3 {
+  text-transform: none;
+}
+.reveal p {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+code.sourceCode {
+  white-space: pre-wrap;
+  width: 100%;
+  margin: 0px;
+  background-color: black;
+}
+
+.sourceCode {
+  background-color: ivory;
+}
+
+code span.co {
+  color: black;
+  background-color: gold;
+}
+
+.reveal pre code {
+  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  margin: 0px;
+  /* width: 1160px; */
+}
+
+.reveal pre {
+  width: 100%;
+  margin: 0px;
+  font-size: 0.85em;
+  white-space: pre-wrap;
+}
+
+.reveal a.sourceLine {
+  color: white;
+  background-color: black;
+  font-size: 110%;
+}
+
+.reveal h1 {
+  text-transform: none;
+}
+
+.reveal h2 {
+  text-transform: none;
+}
+
+.reveal section {
+  padding: 0px 0px;
+}
+
+.reveal .slides > section > section  {
+  padding: 0px 0px;
+}
+
+.grey {
+  color: hsla(0, 100%, 100%, 0.7);
+}
+
+.accent {
+  color: var(--ip-red);
+}
+
+.strategy {
+  color: gold;
+  /* color: #bf7f3f; */
+  font-weight: bold;
+  font-size: 150%;
+}
+
+.strategy::before {
+  content: "☞ ";
+  font-weight: bold;
+}
+
+.strategyNotBig {
+  color: gold;
+  font-weight: bold;
+}
+
+.strategyNotBig::before {
+  content: "☞ ";
+  font-weight: bold;
+}
+
+.notbig {
+  font-size: 100%;
+}
+
+.theory {
+  color: gold;
+  /* font-weight: bold; */
+}
+
+.whee {
+  color: coral
+}
+
+.big_emoji {
+  color: coral;
+  font-size: 64pt;
+  font-weight: bold;
+}
+
+.slide-content {
+  padding-top: 25px;
+}
+
+.console {
+  background-color: gold;
+  color: black;
+}
