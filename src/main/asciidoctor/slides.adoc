@@ -579,7 +579,7 @@ Please prove this type:
 > 🔊 "If you give me an `A`, I'll give you an `A` or `B`."
 
 [.fragment]
-[.whee]#`val proof = (a: A) => Right(a)`#
+[.whee]#`val proof = (a: A) => Left(a)`#
 
 === !
 
@@ -606,7 +606,7 @@ Can we teach a computer?
 //   (a: A, _) => a
 
 // val proof2: A => Either[A, B] =
-//   (a: A) => Right(a)
+//   (a: A) => Left(a)
 
 // val proof: (A, B) => Either[A, B] =
 //   proof1a andThen proof2
@@ -894,12 +894,12 @@ digraph x {
 |===
 | If we had | Could we produce? |
 
-| | [.theory]#`(A, B) => Either[A, C]`# | [.whee]`(a, _) => Right(a)`
+| | [.theory]#`(A, B) => Either[A, C]`# | [.whee]`(a, _) => Left(a)`
 | | ↙︎ ↓ extract args | ↑
 | [.theory]#`(A, B)`# | [.theory]#`Either[A, C]`# | ↑
 | un-pair ↓ |  | ↑
-| [.theory]#`A, B`# | [.theory]#`Either[A, C]`# | [.whee]`(a, _) => Right(a)`
-|  | ↓ choose `A` | ↑ [.whee]`_ andThen Right(_)`
+| [.theory]#`A, B`# | [.theory]#`Either[A, C]`# | [.whee]`(a, _) => Left(a)`
+|  | ↓ choose `A` | ↑ [.whee]`_ andThen Left(_)`
 | [.theory]#`A, B`# | [.theory]#`A`# | [.whee]`(a, _) => a` 
 |===
 
