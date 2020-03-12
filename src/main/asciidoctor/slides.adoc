@@ -771,8 +771,7 @@ include::{sourcedir}/LK.scala[tag=id,indent=0]
 [.fragment]
 [cols="a,2a",frame=none,grid=none]
 |===
-A deduction can be [.accent]#_stuck_#, [.accent]#_discharged_# (done), or [.accent]#_success_# (produces one or more new, but simpler, sequents).
-|
+| A deduction can be [.accent]#_stuck_#, [.accent]#_discharged_# (done), or [.accent]#_success_# (produces one or more new, but simpler, sequents). |
 [source,scala]
 ----
 include::{sourcedir}/Deducer.scala[tag=deduction,indent=0]
@@ -783,7 +782,7 @@ include::{sourcedir}/Deducer.scala[tag=deduction,indent=0]
 
 [cols="a,2a",frame=none,grid=none]
 |===
-A [.accent]#_prover_# attempts to prove a sequent.
+| A [.accent]#_prover_# attempts to prove a sequent.
 |
 [source,scala]
 ----
@@ -908,6 +907,9 @@ digraph x {
 
 ----
 // TODO: "Simply Typed Lambda Calculus" ADT and intepreter
+----
+[.fragment]
+----
 // TODO: macro to build programs at compile-time.
 ----
 
@@ -915,13 +917,17 @@ digraph x {
 
 [cols=".^2a,.^a",frame=none,grid=none]
 |===
-| While not originally popular with t-shirt collectors in 1934, sequent calculus is still cool. |
+| While not originally popular with t-shirt collectors in 1934, *sequent calculus* is definitely cool. |
 image::Nintendo.png[]
 |===
+[.fragment]
 [cols="2a,a",frame=none,grid=none]
 |===
-| Curry-Howard lets us translate our programming problems into logic problems, and back. It's used _everywhere_. And it's not too difficult to implement yourself. |
-[graphviz]
+|
+Curry-Howard lets us translate our _programming problems_ into _**logic problems**_, and back. +
+
+[.accent]#And logic problems are solved with sequent calculus.#
+| [graphviz]
 ....
 digraph x {
   // pad=0.4
@@ -969,6 +975,12 @@ digraph x {
 }
 ....
 |===
+
+// [.fragment]
+// [cols="a",frame=none,grid=none]
+// |===
+// | And it's not too difficult to implement yourself.
+// |===
 
 === type => program in 3 Steps
 
